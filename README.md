@@ -54,7 +54,7 @@ Between September 2021 through February 2022 this project is founded by [German 
 
 ## License
 
-tbd
+Distributed under the GPLv3 License. See [LICENSE.md](./LICENSE.md) for more information.
 
 ## Contact
 
