@@ -24,7 +24,12 @@ tbd
 
 ## Installation
 
-tbd
+Initialize the submodules of this repository by running the following commands.
+
+```shell script
+git submodule init
+git submodule update
+```
 
 ## Usage
 
