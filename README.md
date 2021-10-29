@@ -31,9 +31,35 @@ git submodule init
 git submodule update
 ```
 
+Install GDAL bindings.
+
+```shell script
+brew install gdal
+pip download GDAL
+tar -xpzf GDAL-*.tar.gz
+cd GDAL-*
+python setup.py build_ext --gdal-config /usr/local/Cellar/gdal/*/bin/gdal-config
+python setup.py build
+python setup.py install
+```
+
+Install the following dependencies to fulfill the requirements for this project to run.
+
+```shell script
+python -m pip install --upgrade pip
+pip install flake8 pytest
+pip install shapely
+pip install geojson
+pip install GDAL
+```
+
 ## Usage
 
-tbd
+Run this command to start the main script.
+
+```shell script
+python main.py
+```
 
 ## Roadmap
 
