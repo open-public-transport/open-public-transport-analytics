@@ -4,3 +4,6 @@
 *.DS_Store
 
 /venv/
+
+/GDAL*/*
+GDAL*.tar.gz
