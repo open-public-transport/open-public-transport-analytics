@@ -27,7 +27,8 @@ def main(argv):
     # Set default values
     clean = False
     quiet = False
-    sample_points = 10_000
+    num_sample_points = 10_000
+    cities = ["berlin"]
 
     # Read command line arguments
     try:
@@ -48,7 +49,7 @@ def main(argv):
         elif opt in ("-q", "--quiet"):
             quiet = True
         elif opt in ("-p", "--points"):
-            sample_points = int(arg)
+            num_sample_points = int(arg)
 
     # Set paths
     file_path = os.path.realpath(__file__)
@@ -60,16 +61,18 @@ def main(argv):
     logger = LoggerFacade(results_path, console=True, file=True)
     logger.log_line("Start")
 
-    # Generate sample points
-    PointGenerator().run(
-        logger=logger,
-        data_path=data_path,
-        results_path=os.path.join(results_path, "sample-points"),
-        city="Berlin",
-        sample_points=sample_points,
-        clean=clean,
-        quiet=quiet
-    )
+    for city in cities:
+
+        # Generate sample points
+        sample_points = PointGenerator().run(
+            logger=logger,
+            data_path=data_path,
+            results_path=os.path.join(results_path, city, "sample-points"),
+            city=city,
+            num_sample_points=num_sample_points,
+            clean=clean,
+            quiet=quiet
+        )
 
 
 if __name__ == "__main__":
