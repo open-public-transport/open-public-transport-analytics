@@ -50,6 +50,7 @@ python -m pip install --upgrade pip
 pip install flake8 pytest
 pip install shapely
 pip install geojson
+pip install tdqm
 pip install GDAL
 ```
 
