@@ -141,10 +141,10 @@ def write_coords_to_geojson(coords, file_path):
 class PointGenerator:
 
     @TrackingDecorator.track_time
-    def run(self, logger, data_path, results_path, city="Berlin", sample_points=10_000, quiet=False, clean=False):
+    def run(self, logger, data_path, results_path, city="berlin", num_sample_points=10_000, quiet=False, clean=False):
 
         # Make results path
-        os.makedirs(os.path.join(results_path, city), exist_ok=True)
+        os.makedirs(os.path.join(results_path), exist_ok=True)
 
         # Clean results path
         if clean:
@@ -154,25 +154,27 @@ class PointGenerator:
 
         # Define valid polygons
         valid_polygons = get_polygons(
-            read_geojson(os.path.join(data_path, "inhabitant", city, "inhabitants.geojson")))
+            read_geojson(os.path.join(data_path, city, "inhabitants", "inhabitants.geojson")))
 
         # Define invalid polygons
         invalid_polygons = []
         for invalid_polygon in ["cemetery.geojson", "farmland.geojson", "farmyard.geojson", "forest.geojson",
                                 "garden.geojson", "park.geojson", "recreation_ground.geojson", "water.geojson",
                                 "wood.geojson"]:
-            invalid_polygons += get_polygons(read_geojson(os.path.join(data_path, "landuse", city, invalid_polygon)))
+            invalid_polygons += get_polygons(read_geojson(os.path.join(data_path, city, "landuse", invalid_polygon)))
 
         # Generate points in polygons
-        points = get_random_points_in_polygons(valid_polygons, invalid_polygons, sample_points)
+        points = get_random_points_in_polygons(valid_polygons, invalid_polygons, num_sample_points)
 
         # Get coordinates
         coords = get_coordinates(points)
 
         # Write coords to file
-        write_coords_to_json(coords, os.path.join(results_path, city, "sample-points.json"))
-        write_coords_to_csv(coords, os.path.join(results_path, city, "sample-points.csv"))
-        write_coords_to_geojson(coords, os.path.join(results_path, city, "sample-points.geojson"))
+        write_coords_to_json(coords, os.path.join(results_path, "sample-points.json"))
+        write_coords_to_csv(coords, os.path.join(results_path, "sample-points.csv"))
+        write_coords_to_geojson(coords, os.path.join(results_path, "sample-points.geojson"))
 
         if not quiet:
-            logger.log_line("✓️ Generating " + str(sample_points) + " sample points in " + city)
+            logger.log_line("✓️ Generating " + str(num_sample_points) + " sample points in " + city)
+
+        return coords
