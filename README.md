@@ -34,7 +34,7 @@ git submodule update
 ## Structure
 
 <p align="center">
-  <img src="img/analytics.png" alt="Logo" height="100">
+  <img src="img/analytics.png" alt="structure of the Repo">
 </p>
 
 ## Usage
