@@ -10,8 +10,6 @@ class LoggerFacade:
         self.file = file
         self.telegram = telegram
 
-        shutil.rmtree(results_path, ignore_errors=True)
-
     def log_line(self, message, console=None, file=None, telegram=None):
         if console or (console == None and self.console):
             ConsoleLogger().log_line(message)
