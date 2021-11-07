@@ -107,31 +107,34 @@ def get_coordinates(points):
     return data
 
 
-def write_coords_to_json(coords, file_path):
-    json_data = json.dumps(coords)
-    with open(file_path, "w") as f:
-        f.write("%s" % json_data)
+def write_coords_to_json(coords, file_path, clean=False):
+    if clean or not os.path.exists(file_path):
+        json_data = json.dumps(coords)
+        with open(file_path, "w") as f:
+            f.write("%s" % json_data)
 
 
-def write_coords_to_csv(coords, file_path):
-    with open(file_path, "w") as f:
-        writer = csv.writer(f)
+def write_coords_to_csv(coords, file_path, clean=False):
+    if clean or not os.path.exists(file_path):
+        with open(file_path, "w") as f:
+            writer = csv.writer(f)
+            for coord in coords:
+                writer.writerow([coord["lon"], coord["lat"]])
+
+
+def write_coords_to_geojson(coords, file_path, clean=False):
+    if clean or not os.path.exists(file_path):
+        features = []
         for coord in coords:
-            writer.writerow([coord["lon"], coord["lat"]])
+            feature = {}
+            feature["geometry"] = {"type": "Point", "coordinates": [coord["lon"], coord["lat"]]}
+            feature["type"] = "Feature"
+            features.append(feature)
 
+        collection = FeatureCollection(features)
 
-def write_coords_to_geojson(coords, file_path):
-    features = []
-    for coord in coords:
-        feature = {}
-        feature["geometry"] = {"type": "Point", "coordinates": [coord["lon"], coord["lat"]]}
-        feature["type"] = "Feature"
-        features.append(feature)
-
-    collection = FeatureCollection(features)
-
-    with open(file_path, "w") as f:
-        f.write("%s" % collection)
+        with open(file_path, "w") as f:
+            f.write("%s" % collection)
 
 
 #
@@ -148,7 +151,7 @@ class PointGenerator:
 
         # Clean results path
         if clean:
-            files = glob.glob(os.path.join(results_path, "*.png"))
+            files = glob.glob(os.path.join(results_path, "*"))
             for f in files:
                 os.remove(f)
 
@@ -170,9 +173,9 @@ class PointGenerator:
         coords = get_coordinates(points)
 
         # Write coords to file
-        write_coords_to_json(coords, os.path.join(results_path, "sample-points.json"))
-        write_coords_to_csv(coords, os.path.join(results_path, "sample-points.csv"))
-        write_coords_to_geojson(coords, os.path.join(results_path, "sample-points.geojson"))
+        write_coords_to_json(coords, os.path.join(results_path, "sample-points.json"), clean=clean)
+        write_coords_to_csv(coords, os.path.join(results_path, "sample-points.csv"), clean=clean)
+        write_coords_to_geojson(coords, os.path.join(results_path, "sample-points.geojson"), clean=clean)
 
         if not quiet:
             logger.log_line("✓️ Generating " + str(num_sample_points) + " sample points in " + city)
