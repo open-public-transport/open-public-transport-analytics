@@ -156,15 +156,17 @@ class PointGenerator:
                 os.remove(f)
 
         # Define valid polygons
-        valid_polygons = get_polygons(
-            read_geojson(os.path.join(data_path, city, "inhabitants", "inhabitants.geojson")))
+        polygon_file = os.path.join(data_path, city, "boundary", "districts.geojson")
+        valid_polygons = get_polygons(read_geojson(polygon_file))
 
         # Define invalid polygons
         invalid_polygons = []
         for invalid_polygon in ["cemetery.geojson", "farmland.geojson", "farmyard.geojson", "forest.geojson",
                                 "garden.geojson", "park.geojson", "recreation_ground.geojson", "water.geojson",
                                 "wood.geojson"]:
-            invalid_polygons += get_polygons(read_geojson(os.path.join(data_path, city, "landuse", invalid_polygon)))
+            polygon_file = os.path.join(data_path, city, "landuse", invalid_polygon)
+            if os.path.exists(polygon_file):
+                invalid_polygons += get_polygons(read_geojson(polygon_file))
 
         # Generate points in polygons
         points = get_random_points_in_polygons(valid_polygons, invalid_polygons, num_sample_points)
