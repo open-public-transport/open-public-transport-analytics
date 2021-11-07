@@ -29,7 +29,7 @@ def main(argv):
     clean = False
     quiet = False
     num_sample_points = 10_000
-    cities = ["berlin"]
+    cities = ["berlin", "hamburg"]
 
     # Read command line arguments
     try:
