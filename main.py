@@ -15,6 +15,7 @@ for p in library_paths:
 # Import library classes
 from tracking_decorator import TrackingDecorator
 from point_generator import PointGenerator
+from graph_loader import GraphLoader
 from logger_facade import LoggerFacade
 
 
@@ -62,7 +63,6 @@ def main(argv):
     logger.log_line("Start")
 
     for city in cities:
-
         # Generate sample points
         sample_points = PointGenerator().run(
             logger=logger,
@@ -74,6 +74,26 @@ def main(argv):
             quiet=quiet
         )
 
+        # Load graphs
+        graph_transport = GraphLoader().run(
+            logger=logger,
+            results_path=os.path.join(results_path, city, "graphs"),
+            city=city,
+            transport="all",
+            enhance_with_speed=False,
+            quiet=False,
+            clean=False
+        )
+
+        graph_walk = GraphLoader().run(
+            logger=logger,
+            results_path=os.path.join(results_path, city, "graphs"),
+            city=city,
+            transport="all",
+            enhance_with_speed=False,
+            quiet=False,
+            clean=False
+        )
 
 if __name__ == "__main__":
     main(sys.argv[1:])
