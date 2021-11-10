@@ -31,6 +31,23 @@ git submodule init
 git submodule update
 ```
 
+Install Anaconda
+
+```shell script
+brew install --cask anaconda
+export PATH="/usr/local/anaconda3/bin:$PATH"
+```
+
+Install [osmnx](https://osmnx.readthedocs.io/en/stable/#installation).
+
+```shell script
+conda config --prepend channels conda-forge
+conda create -n ox --strict-channel-priority osmnx
+```
+
+**BEWARE:** Make sure that any venv is deactivated which can be done by `deactivate`.
+**BEWARE:** Make sure that you only activate the `ox` environment using `conda activate ox`.
+
 Install GDAL bindings.
 
 ```shell script
@@ -48,10 +65,11 @@ Install the following dependencies to fulfill the requirements for this project 
 ```shell script
 python -m pip install --upgrade pip
 pip install flake8 pytest
-pip install shapely
 pip install geojson
 pip install tdqm
 pip install GDAL
+pip install networkx
+pip install shapely
 ```
 
 ## Usage
@@ -59,7 +77,15 @@ pip install GDAL
 Run this command to start the main script.
 
 ```shell script
-python main.py
+python main.py [OPTION]...
+
+  -h, --help                           show this help
+  -c, --clean                          clean intermediate results before start
+  -q, --quiet                          do not log outputs
+  -p, --points                         number of sample points to use
+
+Examples:
+  python main.py -c -p 10000
 ```
 
 ## Roadmap
