@@ -66,6 +66,8 @@ def get_means_of_transport_graph(logger, results_path, city, transport, enhance_
 def get_query(city):
     if city == "berlin":
         return "Berlin, Germany"
+    elif city == "hamburg":
+        return "Hamburg, Germany"
     else:
         return None
 
