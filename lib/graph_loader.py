@@ -23,41 +23,44 @@ def get_means_of_transport_graph(logger, results_path, city, transport, enhance_
     else:
         g_transport = None
 
-        if transport == "walk":
-            g_transport = load_graphml_from_file(logger=logger,
-                                                 file_path=os.path.join(results_path, transport + ".graphml"),
-                                                 city=city,
-                                                 network_type=transport, )
-        elif transport == "bike":
-            g_transport = load_graphml_from_file(logger=logger,
-                                                 file_path=os.path.join(results_path, transport + ".graphml"),
-                                                 city=city,
-                                                 network_type=transport, )
-        elif transport == "bus":
-            g_transport = load_graphml_from_file(logger=logger,
-                                                 file_path=os.path.join(results_path, transport + ".graphml"),
-                                                 city=city,
-                                                 custom_filter='["highway"~"secondary|tertiary|residential|bus_stop"]')
-        elif transport == "light_rail":
-            g_transport = load_graphml_from_file(logger=logger,
-                                                 file_path=os.path.join(results_path, transport + ".graphml"),
-                                                 city=city,
-                                                 custom_filter='["railway"~"light_rail|station"]["railway"!="light_rail_entrance"]["railway"!="service_station"]["station"!="subway"]')
-        elif transport == "subway":
-            g_transport = load_graphml_from_file(logger=logger,
-                                                 file_path=os.path.join(results_path, transport + ".graphml"),
-                                                 city=city,
-                                                 custom_filter='["railway"~"subway|station"]["railway"!="subway_entrance"]["railway"!="service_station"]["station"!="light_rail"]["service"!="yard"]')
-        elif transport == "tram":
-            g_transport = load_graphml_from_file(logger=logger,
-                                                 file_path=os.path.join(results_path, transport + ".graphml"),
-                                                 city=city,
-                                                 custom_filter='["railway"~"tram|tram_stop"]["railway"!="tram_crossing"]["train"!="yes"]["station"!="subway"]["station"!="light_rail"]')
+        try:
+            if transport == "walk":
+                g_transport = load_graphml_from_file(logger=logger,
+                                                     file_path=os.path.join(results_path, transport + ".graphml"),
+                                                     city=city,
+                                                     network_type=transport, )
+            elif transport == "bike":
+                g_transport = load_graphml_from_file(logger=logger,
+                                                     file_path=os.path.join(results_path, transport + ".graphml"),
+                                                     city=city,
+                                                     network_type=transport, )
+            elif transport == "bus":
+                g_transport = load_graphml_from_file(logger=logger,
+                                                     file_path=os.path.join(results_path, transport + ".graphml"),
+                                                     city=city,
+                                                     custom_filter='["highway"~"secondary|tertiary|residential|bus_stop"]')
+            elif transport == "light_rail":
+                g_transport = load_graphml_from_file(logger=logger,
+                                                     file_path=os.path.join(results_path, transport + ".graphml"),
+                                                     city=city,
+                                                     custom_filter='["railway"~"light_rail|station"]["railway"!="light_rail_entrance"]["railway"!="service_station"]["station"!="subway"]')
+            elif transport == "subway":
+                g_transport = load_graphml_from_file(logger=logger,
+                                                     file_path=os.path.join(results_path, transport + ".graphml"),
+                                                     city=city,
+                                                     custom_filter='["railway"~"subway|station"]["railway"!="subway_entrance"]["railway"!="service_station"]["station"!="light_rail"]["service"!="yard"]')
+            elif transport == "tram":
+                g_transport = load_graphml_from_file(logger=logger,
+                                                     file_path=os.path.join(results_path, transport + ".graphml"),
+                                                     city=city,
+                                                     custom_filter='["railway"~"tram|tram_stop"]["railway"!="tram_crossing"]["train"!="yes"]["station"!="subway"]["station"!="light_rail"]')
 
-        if enhance_with_speed:
-            return enhance_graph_with_speed(g=g_transport, transport=transport)
-        else:
-            return g_transport
+            if enhance_with_speed:
+                return enhance_graph_with_speed(g=g_transport, transport=transport)
+            else:
+                return g_transport
+        except:
+            return None
 
 
 def get_query(city):
