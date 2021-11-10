@@ -89,7 +89,7 @@ def main(argv):
             logger=logger,
             results_path=os.path.join(results_path, city, "graphs"),
             city=city,
-            transport="all",
+            transport="walk",
             enhance_with_speed=False,
             quiet=False,
             clean=False
