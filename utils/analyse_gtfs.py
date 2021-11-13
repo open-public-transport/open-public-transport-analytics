@@ -112,7 +112,7 @@ def calculation(_):
     print('\n\n')
     
     print("########################### \n"
-    "Thanks for useing these script ... you can find more in the Project OpenPublicTransport ... \n"
+    "Thanks for using these script ... you can find more in the Project OpenPublicTransport under openpublictransport.de ... \n"
     "Support us, contact us, stay tuned!!!")
     
 if __name__ == '__main__':
