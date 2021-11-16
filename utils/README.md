@@ -13,11 +13,11 @@ python .\analyse_gtfs.py --helpshort
 
 Example 1 ->
 ```bash
-python .\analyse_gtfs.py --buckets 24 --source_file 'data/HVV-Soll-Fahrplandaten.zip' --dest_dir 'testdest/'
+python .\analyse_gtfs.py --buckets 24 --source_file 'data/HVV-Soll-Fahrplandaten.zip' --dest_dir 'testdest/' --prefix 'HVV'
 ```
 
 Example 2 ->
 ```bash
-python .\analyse_gtfs.py --buckets 2 --source_file 'data/HVV-Soll-Fahrplandaten.zip' --dest_dir 'testdest/'
+python .\analyse_gtfs.py --buckets 2 --source_file 'data/HVV-Soll-Fahrplandaten.zip' --dest_dir 'testdest/' --prefix 'HVV'
 ```
 Calculate in 2 Hour Buckets ... you recieve Buckets in the window size ... 0-2, 2-4, 4-6, 6-8 ... 22-24 
