@@ -3,7 +3,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/open-public-transport/open-public-transport-analytics">
-    <img src="./logo_with_text.png" alt="Logo" height="80">
+    <img src="img/logo_with_text.png" alt="Logo" height="80">
   </a>
 
   <h1 align="center">Open Public Transport (Analytics)</h1>
@@ -31,6 +31,12 @@ git submodule init
 git submodule update
 ```
 
+## Structure
+
+<p align="center">
+  <img src="img/analytics.png" alt="structure of the Repo">
+</p>
+
 ## Usage
 
 tbd
@@ -50,10 +56,10 @@ Between September 2021 through February 2022 this project is founded by [German 
 
 <p align="center">
   <a href="https://www.bmbf.de/bmbf/en/home/home_node.html">
-    <img src="./logo-bmbf.svg" alt="Logo" height="100">
+    <img src="img/logo-bmbf.svg" alt="Logo" height="100">
   </a>
   <a href="https://prototypefund.de/">
-    <img src="./logo-ptf.svg" alt="Logo" height="80">
+    <img src="img/logo-ptf.svg" alt="Logo" height="80">
   </a>
 </p>
 
