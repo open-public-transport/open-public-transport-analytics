@@ -21,6 +21,8 @@ flags.DEFINE_string('source_file',
                                        )
 flags.DEFINE_string('dest_dir',
                     default='', help='Where do you save all the Stuff .. Default ist current working directory! .. select DIR+/ .. example data/')
+flags.DEFINE_string('prefix',
+                    default='', help='prefix for the results')
 flags.DEFINE_integer('buckets',
                      default=1, help='Integer parameter specifying the bucket size for calculation in hours. Must 24 % VALUE = 0 -> [1,2,3,4,6,8,12,24] ')
 #flags.DEFINE_float('max_fitness',
@@ -52,6 +54,8 @@ def calculation(_):
 
     if flags.FLAGS.dest_dir is not None:
         dest_dir = flags.FLAGS.dest_dir
+    if flags.FLAGS.prefix is not None:
+        dest_dir = dest_dir + flags.FLAGS.prefix + "_"
 
     source_file = flags.FLAGS.source_file
     buckets = flags.FLAGS.buckets
