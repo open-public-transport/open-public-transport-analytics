@@ -16,6 +16,7 @@ for p in library_paths:
 from tracking_decorator import TrackingDecorator
 from point_generator import PointGenerator
 from graph_loader import GraphLoader
+from graph_combiner import GraphCombiner
 from logger_facade import LoggerFacade
 
 
@@ -29,7 +30,7 @@ def main(argv):
     clean = False
     quiet = False
     num_sample_points = 10_000
-    cities = ["berlin", "hamburg"]
+    cities = ["berlin"]
 
     # Read command line arguments
     try:
@@ -60,7 +61,6 @@ def main(argv):
 
     # Initialize logger
     logger = LoggerFacade(results_path, console=True, file=True)
-    logger.log_line("Start")
 
     for city in cities:
         # Generate sample points
@@ -74,7 +74,7 @@ def main(argv):
             quiet=quiet
         )
 
-        # Load graphs
+        # Load transport graph
         graph_transport = GraphLoader().run(
             logger=logger,
             results_path=os.path.join(results_path, city, "graphs"),
@@ -85,6 +85,7 @@ def main(argv):
             clean=False
         )
 
+        # Load walk graph
         graph_walk = GraphLoader().run(
             logger=logger,
             results_path=os.path.join(results_path, city, "graphs"),
@@ -94,6 +95,16 @@ def main(argv):
             quiet=False,
             clean=False
         )
+
+        # Combine transport graph and walk graph
+        graph = GraphCombiner().run(
+            logger=logger,
+            results_path=os.path.join(results_path, city, "graphs"),
+            graph_a=graph_transport,
+            graph_b=graph_walk,
+            connect_a_to_b=True
+        )
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
