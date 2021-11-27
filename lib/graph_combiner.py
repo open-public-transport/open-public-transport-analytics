@@ -122,7 +122,7 @@ def enhance_graph_with_speed(g, time_attribute="time", transport=None):
 class GraphCombiner:
 
     @TrackingDecorator.track_time
-    def run(self, logger, results_path, graph_a, graph_b, connect_a_to_b=False, clean=False):
+    def run(self, logger, results_path, graph_a, graph_b, connect_a_to_b=False, clean=False, quiet=False):
         """
         Combines two graphs into one
 
@@ -187,5 +187,6 @@ class GraphCombiner:
 
             return graph
         else:
-            logger.log_line("Load " + file_path)
+            if not quiet:
+                logger.log_line("Load " + file_path)
             ox.load_graphml(file_path)

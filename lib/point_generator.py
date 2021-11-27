@@ -1,5 +1,4 @@
 import csv
-import glob
 import json
 import os
 import random
@@ -107,34 +106,31 @@ def get_coordinates(points):
     return data
 
 
-def write_coords_to_json(coords, file_path, clean=False):
-    if clean or not os.path.exists(file_path):
-        json_data = json.dumps(coords)
-        with open(file_path, "w") as f:
-            f.write("%s" % json_data)
+def write_coords_to_json(coords, file_path):
+    json_data = json.dumps(coords)
+    with open(file_path, "w") as f:
+        f.write("%s" % json_data)
 
 
-def write_coords_to_csv(coords, file_path, clean=False):
-    if clean or not os.path.exists(file_path):
-        with open(file_path, "w") as f:
-            writer = csv.writer(f)
-            for coord in coords:
-                writer.writerow([coord["lon"], coord["lat"]])
-
-
-def write_coords_to_geojson(coords, file_path, clean=False):
-    if clean or not os.path.exists(file_path):
-        features = []
+def write_coords_to_csv(coords, file_path):
+    with open(file_path, "w") as f:
+        writer = csv.writer(f)
         for coord in coords:
-            feature = {}
-            feature["geometry"] = {"type": "Point", "coordinates": [coord["lon"], coord["lat"]]}
-            feature["type"] = "Feature"
-            features.append(feature)
+            writer.writerow([coord["lon"], coord["lat"]])
 
-        collection = FeatureCollection(features)
 
-        with open(file_path, "w") as f:
-            f.write("%s" % collection)
+def write_coords_to_geojson(coords, file_path):
+    features = []
+    for coord in coords:
+        feature = {}
+        feature["geometry"] = {"type": "Point", "coordinates": [coord["lon"], coord["lat"]]}
+        feature["type"] = "Feature"
+        features.append(feature)
+
+    collection = FeatureCollection(features)
+
+    with open(file_path, "w") as f:
+        f.write("%s" % collection)
 
 
 #
@@ -150,36 +146,33 @@ class PointGenerator:
         os.makedirs(os.path.join(results_path), exist_ok=True)
 
         # Clean results path
-        if clean:
-            files = glob.glob(os.path.join(results_path, "*"))
-            for f in files:
-                os.remove(f)
+        if clean or not os.path.exists(os.path.join(results_path, "sample-points.csv")):
 
-        # Define valid polygons
-        polygon_file = os.path.join(data_path, city, "boundary", "districts.geojson")
-        valid_polygons = get_polygons(read_geojson(polygon_file))
+            # Define valid polygons
+            polygon_file = os.path.join(data_path, city, "boundary", "districts.geojson")
+            valid_polygons = get_polygons(read_geojson(polygon_file))
 
-        # Define invalid polygons
-        invalid_polygons = []
-        for invalid_polygon in ["cemetery.geojson", "farmland.geojson", "farmyard.geojson", "forest.geojson",
-                                "garden.geojson", "park.geojson", "recreation_ground.geojson", "water.geojson",
-                                "wood.geojson"]:
-            polygon_file = os.path.join(data_path, city, "landuse", invalid_polygon)
-            if os.path.exists(polygon_file):
-                invalid_polygons += get_polygons(read_geojson(polygon_file))
+            # Define invalid polygons
+            invalid_polygons = []
+            for invalid_polygon in ["cemetery.geojson", "farmland.geojson", "farmyard.geojson", "forest.geojson",
+                                    "garden.geojson", "park.geojson", "recreation_ground.geojson", "water.geojson",
+                                    "wood.geojson"]:
+                polygon_file = os.path.join(data_path, city, "landuse", invalid_polygon)
+                if os.path.exists(polygon_file):
+                    invalid_polygons += get_polygons(read_geojson(polygon_file))
 
-        # Generate points in polygons
-        points = get_random_points_in_polygons(valid_polygons, invalid_polygons, num_sample_points)
+            # Generate points in polygons
+            points = get_random_points_in_polygons(valid_polygons, invalid_polygons, num_sample_points)
 
-        # Get coordinates
-        coords = get_coordinates(points)
+            # Get coordinates
+            coords = get_coordinates(points)
 
-        # Write coords to file
-        write_coords_to_json(coords, os.path.join(results_path, "sample-points.json"), clean=clean)
-        write_coords_to_csv(coords, os.path.join(results_path, "sample-points.csv"), clean=clean)
-        write_coords_to_geojson(coords, os.path.join(results_path, "sample-points.geojson"), clean=clean)
+            # Write coords to file
+            write_coords_to_json(coords, os.path.join(results_path, "sample-points.json"))
+            write_coords_to_csv(coords, os.path.join(results_path, "sample-points.csv"))
+            write_coords_to_geojson(coords, os.path.join(results_path, "sample-points.geojson"))
 
-        if not quiet:
-            logger.log_line("✓️ Generating " + str(num_sample_points) + " sample points in " + city)
+            if not quiet:
+                logger.log_line("✓️ Generating " + str(num_sample_points) + " sample points in " + city)
 
-        return coords
+            return coords
