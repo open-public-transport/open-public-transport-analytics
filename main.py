@@ -64,6 +64,7 @@ def main(argv):
     # Initialize logger
     logger = LoggerFacade(results_path, console=True, file=True)
 
+    # Iterate over cities
     for city in cities:
         # Generate sample points
         sample_points = PointGenerator().run(
@@ -83,8 +84,8 @@ def main(argv):
             city=city,
             transport="all",
             enhance_with_speed=False,
-            quiet=False,
-            clean=False
+            clean=clean,
+            quiet=quiet
         )
 
         # Load walk graph
@@ -94,8 +95,8 @@ def main(argv):
             city=city,
             transport="walk",
             enhance_with_speed=False,
-            quiet=False,
-            clean=False
+            clean=clean,
+            quiet=quiet
         )
 
         # Combine transport graph and walk graph
@@ -104,13 +105,15 @@ def main(argv):
             results_path=os.path.join(results_path, city, "graphs"),
             graph_a=graph_transport,
             graph_b=graph_walk,
-            connect_a_to_b=True
+            connect_a_to_b=True,
+            clean=clean,
+            quiet=quiet
         )
 
         # Iterate over travel times
         for travel_time in travel_times:
             # Generate points
-            points_with_spatial_distance, failed_points = IsochroneBuilder().run(
+            IsochroneBuilder().run(
                 logger=logger,
                 results_path=os.path.join(results_path, city, "geojson"),
                 graph=graph,

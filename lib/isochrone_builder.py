@@ -64,7 +64,7 @@ def get_distances(start_point, latitudes, longitudes):
     return [geopy.distance.geodesic(point, start_point).meters for point in zip(latitudes, longitudes)]
 
 
-def write_geojson(file_path, coords, travel_time):
+def write_points_to_geojson(file_path, coords, travel_time):
     features = []
     for coord in coords:
         feature = {}
@@ -132,13 +132,13 @@ class IsochroneBuilder:
             else:
                 failed_points.append(point_with_spatial_distance)
 
-        write_geojson(
+        write_points_to_geojson(
             file_path=os.path.join(results_path, "isochrones-" + str(travel_time)),
             coords=points_with_spatial_distance,
             travel_time=travel_time
         )
 
-        write_geojson(
+        write_points_to_geojson(
             file_path=os.path.join(results_path, "isochrones-" + str(travel_time)) + "-failed",
             coords=failed_points,
             travel_time=travel_time
