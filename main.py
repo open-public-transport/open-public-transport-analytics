@@ -18,6 +18,7 @@ from point_generator import PointGenerator
 from graph_loader import GraphLoader
 from graph_combiner import GraphCombiner
 from logger_facade import LoggerFacade
+from isochrone_builder import IsochroneBuilder
 
 
 #
@@ -30,7 +31,8 @@ def main(argv):
     clean = False
     quiet = False
     num_sample_points = 10_000
-    cities = ["berlin"]
+    cities = ["berlin", "hamburg"]
+    travel_times = [15]
 
     # Read command line arguments
     try:
@@ -104,6 +106,19 @@ def main(argv):
             graph_b=graph_walk,
             connect_a_to_b=True
         )
+
+        # Iterate over travel times
+        for travel_time in travel_times:
+            # Generate points
+            points_with_spatial_distance, failed_points = IsochroneBuilder().run(
+                logger=logger,
+                results_path=os.path.join(results_path, city, "geojson"),
+                graph=graph,
+                sample_points=sample_points,
+                travel_time=travel_time,
+                clean=clean,
+                quiet=quiet
+            )
 
 
 if __name__ == "__main__":
