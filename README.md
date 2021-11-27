@@ -70,6 +70,7 @@ pip install tdqm
 pip install GDAL
 pip install networkx
 pip install shapely
+pip install geopy
 ```
 
 ## Usage
