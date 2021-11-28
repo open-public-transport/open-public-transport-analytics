@@ -16,6 +16,7 @@ for p in library_paths:
 from tracking_decorator import TrackingDecorator
 from point_generator import PointGenerator
 from graph_loader import GraphLoader
+from station_loader import StationLoader
 from graph_combiner import GraphCombiner
 from logger_facade import LoggerFacade
 from isochrone_builder import IsochroneBuilder
@@ -84,6 +85,16 @@ def main(argv):
             city=city,
             transport="all",
             enhance_with_speed=False,
+            clean=clean,
+            quiet=quiet
+        )
+
+        # Load transport stations
+        stations_transport = StationLoader().run(
+            logger=logger,
+            results_path=os.path.join(results_path, city, "stations"),
+            city=city,
+            transport="all",
             clean=clean,
             quiet=quiet
         )
