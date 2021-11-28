@@ -169,6 +169,8 @@ def enhance_graph_with_speed(g, time_attribute="time", transport=None):
 
     return g
 
+import warnings
+warnings.filterwarnings("ignore")
 
 #
 # Main
