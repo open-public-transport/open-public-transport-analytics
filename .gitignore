@@ -6,5 +6,8 @@
 /venv/
 /cache/
 
+/lib/__pycache__
+/lib/log/__pycache__
+
 /GDAL*/*
 GDAL*.tar.gz
