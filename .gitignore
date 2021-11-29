@@ -8,6 +8,9 @@
 
 /lib/__pycache__
 /lib/log/__pycache__
+/lib/loader/__pycache__
+/lib/loader/osmnx/__pycache__
+/lib/loader/overpass/__pycache__
 
 /GDAL*/*
 GDAL*.tar.gz
