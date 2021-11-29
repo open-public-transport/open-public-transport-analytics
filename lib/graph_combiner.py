@@ -43,7 +43,7 @@ class GraphCombiner:
             for station_node_id in tqdm(iterable=station_node_ids, desc="Compose graphs", total=len(station_node_ids),
                                         unit="node"):
 
-                if not station_node_id in graph_transport.nodes:
+                if station_node_id in graph_transport.nodes:
 
                     # Get coordinates of node
                     station_node_point = graph_transport.nodes[station_node_id]
