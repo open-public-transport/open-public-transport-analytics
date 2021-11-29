@@ -67,7 +67,7 @@ def main(argv):
     # Iterate over cities
     for city in cities:
 
-        results_path = os.path.join(results_path, "city")
+        results_path = os.path.join(results_path, city)
 
         # Initialize logger
         logger = LoggerFacade(results_path, console=True, file=True)
@@ -76,7 +76,7 @@ def main(argv):
         sample_points = PointGenerator().run(
             logger=logger,
             data_path=data_path,
-            results_path=os.path.join(results_path, city, "sample-points"),
+            results_path=os.path.join(results_path, "sample-points"),
             city=city,
             num_sample_points=num_sample_points,
             clean=clean,
@@ -86,7 +86,7 @@ def main(argv):
         # Load transport graph
         graph_transport = GraphLoader().run(
             logger=logger,
-            results_path=os.path.join(results_path, city, "graphs"),
+            results_path=os.path.join(results_path, "graphs"),
             city=city,
             transport="all",
             enhance_with_speed=False,
@@ -97,7 +97,7 @@ def main(argv):
         # Load transport stations
         stations = StationLoaderOverpass().run(
             logger=logger,
-            results_path=os.path.join(results_path, city, "stations"),
+            results_path=os.path.join(results_path, "stations"),
             city=city,
             transport="all",
             clean=clean,
@@ -107,7 +107,7 @@ def main(argv):
         # Load walk graph
         graph_walk = GraphLoader().run(
             logger=logger,
-            results_path=os.path.join(results_path, city, "graphs"),
+            results_path=os.path.join(results_path, "graphs"),
             city=city,
             transport="walk",
             enhance_with_speed=False,
@@ -118,7 +118,7 @@ def main(argv):
         # Combine transport graph and walk graph
         graph = GraphCombiner().run(
             logger=logger,
-            results_path=os.path.join(results_path, city, "graphs"),
+            results_path=os.path.join(results_path, "graphs"),
             graph_transport=graph_transport,
             graph_walk=graph_walk,
             stations=stations,
@@ -131,7 +131,7 @@ def main(argv):
             # Generate points
             IsochroneBuilder().run(
                 logger=logger,
-                results_path=os.path.join(results_path, city, "geojson"),
+                results_path=os.path.join(results_path, "geojson"),
                 graph=graph,
                 sample_points=sample_points,
                 travel_time=travel_time,
