@@ -16,7 +16,7 @@ for p in library_paths:
 from tracking_decorator import TrackingDecorator
 from point_generator import PointGenerator
 from graph_loader import GraphLoader
-from station_loader import StationLoader
+from station_loader_overpass import StationLoaderOverpass
 from graph_combiner import GraphCombiner
 from logger_facade import LoggerFacade
 from isochrone_builder import IsochroneBuilder
@@ -62,11 +62,14 @@ def main(argv):
     data_path = os.path.join(script_path, "data", "data")
     results_path = os.path.join(script_path, "results", "results")
 
-    # Initialize logger
-    logger = LoggerFacade(results_path, console=True, file=True)
-
     # Iterate over cities
     for city in cities:
+
+        results_path = os.path.join(results_path, "city")
+
+        # Initialize logger
+        logger = LoggerFacade(results_path, console=True, file=True)
+
         # Generate sample points
         sample_points = PointGenerator().run(
             logger=logger,
@@ -90,7 +93,7 @@ def main(argv):
         )
 
         # Load transport stations
-        stations_transport = StationLoader().run(
+        stations = StationLoaderOverpass().run(
             logger=logger,
             results_path=os.path.join(results_path, city, "stations"),
             city=city,
@@ -114,9 +117,9 @@ def main(argv):
         graph = GraphCombiner().run(
             logger=logger,
             results_path=os.path.join(results_path, city, "graphs"),
-            graph_a=graph_transport,
-            graph_b=graph_walk,
-            connect_a_to_b=True,
+            graph_transport=graph_transport,
+            graph_walk=graph_walk,
+            stations=stations,
             clean=clean,
             quiet=quiet
         )
