@@ -9,8 +9,7 @@ import osmnx as ox
 from tracking_decorator import TrackingDecorator
 
 
-def get_means_of_transport_graph(logger, results_path, city, transport, enhance_with_speed=False, clean=False,
-                                 quiet=False):
+def get_transport_graph(logger, results_path, city, transport, enhance_with_speed=False, clean=False, quiet=False):
     graph_transport = None
 
     try:
@@ -61,7 +60,7 @@ def get_means_of_transport_graph(logger, results_path, city, transport, enhance_
                 quiet=quiet
             )
         elif transport == "subway":
-            graph_transport = load_graphml_from_file(
+             graph_transport = load_graphml_from_file(
                 logger=logger,
                 file_path=os.path.join(results_path, transport + ".graphml"),
                 city=city,
@@ -80,9 +79,8 @@ def get_means_of_transport_graph(logger, results_path, city, transport, enhance_
                 clean=clean,
                 quiet=quiet
             )
-
         if enhance_with_speed:
-            return enhance_graph_with_speed(g=graph_transport, transport=transport)
+            return enhance_graph_with_speed(graph=graph_transport, transport=transport)
         else:
             return graph_transport
     except:
@@ -102,31 +100,31 @@ def load_graphml_from_file(logger, file_path, city, network_type=None, custom_fi
     query = get_query(city)
 
     if clean or not path.exists(file_path):
-        if not quiet:
-            logger.log_line("Download " + file_path)
-        graph = load_graphml(query=query,
-                             network_type=network_type,
-                             custom_filter=custom_filter)
+        graph = load_graphml(query=query, network_type=network_type, custom_filter=custom_filter)
         ox.save_graphml(graph, file_path)
+
+        if not quiet:
+            logger.log_line(f"✓ Download {file_path} with {len(graph.nodes)} nodes and {len(graph.edges)} edges")
         return graph
     else:
+        graph = ox.load_graphml(file_path)
         if not quiet:
-            logger.log_line("Load " + file_path)
-        return ox.load_graphml(file_path)
+            logger.log_line(f"✓ Load {file_path} with {len(graph.nodes)} nodes and {len(graph.edges)} edges")
+        return graph
 
 
 def load_complete_graphml_from_file(logger, file_path, city, results_path, clean=False, quiet=False):
     if clean or not path.exists(file_path):
         graph = nx.algorithms.operators.all.compose_all(
             list(filter(partial(is_not, None), [
-                get_means_of_transport_graph(logger=logger, results_path=results_path, city=city, transport="bus",
-                                             enhance_with_speed=True, clean=clean, quiet=quiet),
-                get_means_of_transport_graph(logger=logger, results_path=results_path, city=city, transport="subway",
-                                             enhance_with_speed=True, clean=clean, quiet=quiet),
-                get_means_of_transport_graph(logger=logger, results_path=results_path, city=city, transport="tram",
-                                             enhance_with_speed=True, clean=clean, quiet=quiet),
-                get_means_of_transport_graph(logger=logger, results_path=results_path, city=city,
-                                             transport="light_rail", enhance_with_speed=True, clean=clean, quiet=quiet)
+                get_transport_graph(logger=logger, results_path=results_path, city=city, transport="bus",
+                                    enhance_with_speed=True, clean=clean, quiet=quiet),
+                get_transport_graph(logger=logger, results_path=results_path, city=city, transport="subway",
+                                    enhance_with_speed=True, clean=clean, quiet=quiet),
+                get_transport_graph(logger=logger, results_path=results_path, city=city, transport="tram",
+                                    enhance_with_speed=True, clean=clean, quiet=quiet),
+                get_transport_graph(logger=logger, results_path=results_path, city=city,
+                                    transport="light_rail", enhance_with_speed=True, clean=clean, quiet=quiet)
             ])))
 
         ox.save_graphml(graph, file_path)
@@ -138,16 +136,18 @@ def load_complete_graphml_from_file(logger, file_path, city, results_path, clean
 
 
 def load_graphml(query, network_type=None, custom_filter=None):
-    return ox.graph_from_place(query=query,
-                               simplify=True,
-                               retain_all=False,
-                               buffer_dist=2500,
-                               network_type=network_type,
-                               custom_filter=custom_filter)
+    return ox.graph_from_place(
+        query=query,
+        simplify=False,
+        retain_all=True,
+        buffer_dist=2500,
+        network_type=network_type,
+        custom_filter=custom_filter
+    )
 
 
-def enhance_graph_with_speed(g, time_attribute="time", transport=None):
-    for _, _, _, data in g.edges(data=True, keys=True):
+def enhance_graph_with_speed(graph, time_attribute="time", transport=None):
+    for _, _, _, data in graph.edges(data=True, keys=True):
 
         speed = None
 
@@ -167,10 +167,13 @@ def enhance_graph_with_speed(g, time_attribute="time", transport=None):
         if speed is not None:
             data[time_attribute] = data["length"] / (float(speed) * 1000 / 60)
 
-    return g
+    return graph
+
 
 import warnings
+
 warnings.filterwarnings("ignore")
+
 
 #
 # Main
@@ -184,7 +187,7 @@ class GraphLoader:
         os.makedirs(os.path.join(results_path), exist_ok=True)
 
         # Load graph
-        graph = get_means_of_transport_graph(
+        graph = get_transport_graph(
             logger=logger,
             results_path=results_path,
             city=city,
@@ -193,8 +196,5 @@ class GraphLoader:
             clean=clean,
             quiet=quiet
         )
-
-        if not quiet:
-            logger.log_line("✓️ Load graph for " + str(transport) + " transport in " + city)
 
         return graph
