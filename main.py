@@ -5,6 +5,8 @@ import sys
 # Make library available in path
 library_paths = [
     os.path.join(os.getcwd(), "lib"),
+    os.path.join(os.getcwd(), "lib", "loader", "osmnx"),
+    os.path.join(os.getcwd(), "lib", "loader", "overpass"),
     os.path.join(os.getcwd(), "lib", "log"),
 ]
 
