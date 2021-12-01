@@ -62,12 +62,12 @@ def main(argv):
     file_path = os.path.realpath(__file__)
     script_path = os.path.dirname(file_path)
     data_path = os.path.join(script_path, "data", "data")
-    results_path = os.path.join(script_path, "results", "results")
+    base_results_path = os.path.join(script_path, "results", "results")
 
     # Iterate over cities
     for city in cities:
 
-        results_path = os.path.join(results_path, city)
+        results_path = os.path.join(base_results_path, city)
 
         # Initialize logger
         logger = LoggerFacade(results_path, console=True, file=True)
@@ -89,7 +89,7 @@ def main(argv):
             results_path=os.path.join(results_path, "graphs"),
             city=city,
             transport="all",
-            enhance_with_speed=False,
+            enhance_with_speed=True,
             clean=clean,
             quiet=quiet
         )
@@ -104,13 +104,17 @@ def main(argv):
             quiet=quiet
         )
 
+        if stations is None:
+            logger.log_line(f"✗ Warning: Could not load any stations for {city}. Skip further processing")
+            continue
+
         # Load walk graph
         graph_walk = GraphLoader().run(
             logger=logger,
             results_path=os.path.join(results_path, "graphs"),
             city=city,
             transport="walk",
-            enhance_with_speed=False,
+            enhance_with_speed=True,
             clean=clean,
             quiet=quiet
         )

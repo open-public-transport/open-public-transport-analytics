@@ -112,6 +112,13 @@ def write_coords_to_json(coords, file_path):
         f.write("%s" % json_data)
 
 
+def load_coord_from_json(file_path):
+    with open(file_path, "r") as f:
+        text = f.read()
+
+    return json.loads(text)
+
+
 def write_coords_to_csv(coords, file_path):
     with open(file_path, "w") as f:
         writer = csv.writer(f)
@@ -145,8 +152,8 @@ class PointGenerator:
         # Make results path
         os.makedirs(os.path.join(results_path), exist_ok=True)
 
-        # Clean results path
-        if clean or not os.path.exists(os.path.join(results_path, "sample-points.csv")):
+        # Check if result needs to be generated
+        if clean or not os.path.exists(os.path.join(results_path, "sample-points.json")):
 
             # Define valid polygons
             polygon_file = os.path.join(data_path, city, "boundary", "districts.geojson")
@@ -173,6 +180,17 @@ class PointGenerator:
             write_coords_to_geojson(coords, os.path.join(results_path, "sample-points.geojson"))
 
             if not quiet:
-                logger.log_line("✓️ Generating " + str(num_sample_points) + " sample points in " + city)
+                logger.log_line(f"✓️ Generate {str(num_sample_points)} sample points in {city}")
+
+            return coords
+        else:
+
+            coords = load_coord_from_json(os.path.join(results_path, "sample-points.json"))
+
+            if not quiet:
+                logger.log_line(f"✓️ Load {str(len(coords))} sample points for {city}")
+            if len(coords) != num_sample_points:
+                logger.log_line(
+                    f"✗️ Warning: mismatch between number of requested sample points {str(num_sample_points)} and loaded sample points {len(coords)}")
 
             return coords
