@@ -11,15 +11,14 @@ from tqdm import tqdm
 from tracking_decorator import TrackingDecorator
 
 
-def get_spatial_distance(graph, start_point, travel_time, distance_attribute="time"):
-    walking_distance_meters = 0
-
+def get_spatial_distance(logger, graph, start_point, travel_time, distance_attribute="time"):
     try:
         nodes, edges, walking_distance_meters = get_possible_routes(
-            graph,
-            start_point,
-            travel_time,
-            distance_attribute
+            graph=graph,
+            start_point=start_point,
+            travel_time=travel_time,
+            distance_attribute=distance_attribute,
+            calculate_walking_distance=True
         )
 
         longitudes, latitudes = get_convex_hull(nodes=nodes)
@@ -29,12 +28,18 @@ def get_spatial_distance(graph, start_point, travel_time, distance_attribute="ti
                np.median(transport_distances_meters) + walking_distance_meters, \
                np.min(transport_distances_meters) + walking_distance_meters, \
                np.max(transport_distances_meters) + walking_distance_meters
-    except:
-        return walking_distance_meters, walking_distance_meters, walking_distance_meters, walking_distance_meters
+    except Exception as e:
+        logger.log_line(f"✗️ Exception: {str(e)}")
+        return 0, 0, 0, 0
 
 
-def get_possible_routes(g, start_point, travel_time, distance_attribute, calculate_walking_distance=False):
-    center_node, distance_to_station_meters = ox.nearest_nodes(g, start_point, return_dist=True)
+def get_possible_routes(graph, start_point, travel_time, distance_attribute, calculate_walking_distance=False):
+    center_node, distance_to_station_meters = ox.nearest_nodes(
+        G=graph,
+        X=start_point[1],
+        Y=start_point[0],
+        return_dist=True
+    )
 
     if calculate_walking_distance:
         walking_speed_meters_per_minute = 100
@@ -49,7 +54,7 @@ def get_possible_routes(g, start_point, travel_time, distance_attribute, calcula
         radius = travel_time
 
     if radius > 0:
-        subgraph = nx.ego_graph(g, center_node, radius=radius, distance=distance_attribute)
+        subgraph = nx.ego_graph(graph, center_node, radius=radius, distance=distance_attribute)
         nodes, edges = ox.graph_to_gdfs(subgraph)
         return nodes, edges, walking_distance_meters
     else:
@@ -113,6 +118,7 @@ class IsochroneBuilder:
             median_spatial_distance, \
             min_spatial_distance, \
             max_spatial_distance = get_spatial_distance(
+                logger=logger,
                 graph=graph,
                 start_point=start_point,
                 travel_time=travel_time
