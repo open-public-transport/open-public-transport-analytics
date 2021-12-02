@@ -7,7 +7,7 @@ import osmnx as ox
 from tracking_decorator import TrackingDecorator
 
 
-def download_transport_graph(logger, results_path, city, transport, enhance_with_speed=False):
+def download_transport_graph(logger, results_path, city, transport, simplify=False, enhance_with_speed=False):
     graph_transport = None
     file_path = os.path.join(results_path, transport + ".graphml")
 
@@ -16,40 +16,47 @@ def download_transport_graph(logger, results_path, city, transport, enhance_with
             graph_transport = download_complete_graph(
                 logger=logger,
                 city=city,
+                simplify=simplify,
                 results_path=results_path
             )
         elif transport == "walk":
             graph_transport = download_graph(
                 city=city,
-                network_type=transport
+                network_type=transport,
+                simplify=simplify,
             )
         elif transport == "bike":
             graph_transport = download_graph(
                 city=city,
-                network_type=transport
+                network_type=transport,
+                simplify=simplify,
             )
         elif transport == "bus":
             graph_transport = download_graph(
                 city=city,
-                custom_filter='["highway"~"secondary|tertiary|residential|bus_stop"]'
+                custom_filter='["highway"~"secondary|tertiary|residential|bus_stop"]',
+                simplify=simplify,
             )
         elif transport == "light_rail":
             graph_transport = download_graph(
                 city=city,
                 custom_filter='["railway"~"light_rail|station"]["railway"!="light_rail_entrance"]'
-                              '["railway"!="service_station"]["station"!="subway"]'
+                              '["railway"!="service_station"]["station"!="subway"]',
+                simplify=simplify,
             )
         elif transport == "subway":
             graph_transport = download_graph(
                 city=city,
                 custom_filter='["railway"~"subway|station"]["railway"!="subway_entrance"]["railway"!="service_station"]'
-                              '["station"!="light_rail"]["service"!="yard"]'
+                              '["station"!="light_rail"]["service"!="yard"]',
+                simplify=simplify,
             )
         elif transport == "tram":
             graph_transport = download_graph(
                 city=city,
                 custom_filter='["railway"~"tram|tram_stop"]["railway"!="tram_crossing"]["train"!="yes"]'
-                              '["station"!="subway"]["station"!="light_rail"]'
+                              '["station"!="subway"]["station"!="light_rail"]',
+                simplify=simplify,
             )
 
         # Enhance graph with speed
@@ -74,10 +81,10 @@ def get_query(city):
         return None
 
 
-def download_graph(city, network_type=None, custom_filter=None):
+def download_graph(city, network_type=None, custom_filter=None, simplify=False):
     return ox.graph_from_place(
         query=get_query(city),
-        simplify=True,
+        simplify=simplify,
         retain_all=False,
         buffer_dist=2500,
         network_type=network_type,
@@ -85,17 +92,17 @@ def download_graph(city, network_type=None, custom_filter=None):
     )
 
 
-def download_complete_graph(logger, city, results_path):
+def download_complete_graph(logger, city, simplify, results_path):
     return nx.algorithms.operators.all.compose_all(
         list(filter(partial(is_not, None), [
             download_transport_graph(logger=logger, results_path=results_path, city=city, transport="bus",
-                                     enhance_with_speed=True),
+                                     simplify=simplify, enhance_with_speed=True),
             download_transport_graph(logger=logger, results_path=results_path, city=city, transport="subway",
-                                     enhance_with_speed=True),
+                                     simplify=simplify, enhance_with_speed=True),
             download_transport_graph(logger=logger, results_path=results_path, city=city, transport="tram",
-                                     enhance_with_speed=True),
+                                     simplify=simplify, enhance_with_speed=True),
             download_transport_graph(logger=logger, results_path=results_path, city=city, transport="light_rail",
-                                     enhance_with_speed=True)
+                                     simplify=simplify, enhance_with_speed=True)
         ])))
 
 
@@ -139,12 +146,16 @@ warnings.filterwarnings("ignore")
 class GraphLoader:
 
     @TrackingDecorator.track_time
-    def run(self, logger, results_path, city, transport, enhance_with_speed=False, clean=False, quiet=False):
+    def run(self, logger, results_path, city, transport, simplify=False, enhance_with_speed=False, clean=False,
+            quiet=False):
         # Make results path
         os.makedirs(os.path.join(results_path), exist_ok=True)
 
         # Define file path
-        file_path = os.path.join(results_path, transport + ".graphml")
+        if simplify:
+            file_path = os.path.join(results_path, transport + "-simplified.graphml")
+        else:
+            file_path = os.path.join(results_path, transport + "-unsimplified.graphml")
 
         # Check if result needs to be generated
         if clean or not os.path.exists(file_path):
@@ -155,6 +166,7 @@ class GraphLoader:
                 results_path=results_path,
                 city=city,
                 transport=transport,
+                simplify=simplify,
                 enhance_with_speed=enhance_with_speed,
             )
 
