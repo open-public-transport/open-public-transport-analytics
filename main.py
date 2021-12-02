@@ -89,6 +89,7 @@ def main(argv):
             results_path=os.path.join(results_path, "graphs"),
             city=city,
             transport="all",
+            simplify=True,
             enhance_with_speed=True,
             clean=clean,
             quiet=quiet
@@ -114,6 +115,7 @@ def main(argv):
             results_path=os.path.join(results_path, "graphs"),
             city=city,
             transport="walk",
+            simplify=True,
             enhance_with_speed=True,
             clean=clean,
             quiet=quiet
