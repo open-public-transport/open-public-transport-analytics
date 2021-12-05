@@ -82,7 +82,7 @@ def download_json(file_path, data, clean=False):
         elements = data["elements"]
 
         with open(file_path, "w") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+            json.dump(elements, f, ensure_ascii=False, indent=4)
 
         return elements
 
