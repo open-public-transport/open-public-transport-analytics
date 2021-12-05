@@ -20,8 +20,9 @@ from tracking_decorator import TrackingDecorator
 from point_generator import PointGenerator
 from peartree_graph_loader import PeartreeGraphLoader
 from osmnx_graph_loader import OsmnxGraphLoader
+from graph_transformer import GraphTransformer
 from logger_facade import LoggerFacade
-
+from isochrone_builder import IsochroneBuilder
 
 #
 # Main
@@ -81,18 +82,6 @@ def main(argv):
             quiet=quiet
         )
 
-        # Load transport graph
-        graph_transport = PeartreeGraphLoader().run(
-            logger=logger,
-            data_path=data_path,
-            results_path=os.path.join(results_path, "graphs", "peartree"),
-            city=city,
-            start_time=7 * 60 * 60,
-            end_time=8 * 60 * 60,
-            clean=clean,
-            quiet=quiet
-        )
-
         # Load walk graph
         graph_walk = OsmnxGraphLoader().run(
             logger=logger,
@@ -101,6 +90,28 @@ def main(argv):
             transport="walk",
             simplify=True,
             enhance_with_speed=True,
+            clean=clean,
+            quiet=quiet
+        )
+
+        # Transform walk graph
+        graph_walk = GraphTransformer().run(
+            logger=logger,
+            results_path=os.path.join(results_path, "graphs", "osmnx"),
+            graph=graph_walk,
+            clean=clean,
+            quiet=quiet
+        )
+
+        # Load transport graph
+        graph = PeartreeGraphLoader().run(
+            logger=logger,
+            data_path=data_path,
+            results_path=os.path.join(results_path, "graphs", "peartree"),
+            city=city,
+            start_time=7 * 60 * 60,
+            end_time=8 * 60 * 60,
+            existing_graph=graph_walk,
             clean=clean,
             quiet=quiet
         )
