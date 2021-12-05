@@ -9,7 +9,11 @@ from tracking_decorator import TrackingDecorator
 
 def download_transport_graph(logger, results_path, city, transport, simplify=False, enhance_with_speed=False):
     graph_transport = None
-    file_path = os.path.join(results_path, transport + ".graphml")
+
+    if simplify:
+        file_path = os.path.join(results_path, transport + "-simplified.graphml")
+    else:
+        file_path = os.path.join(results_path, transport + "-unsimplified.graphml")
 
     try:
         if transport == "all":
