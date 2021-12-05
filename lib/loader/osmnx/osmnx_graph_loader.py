@@ -116,7 +116,7 @@ def enhance_graph_with_speed(graph, time_attribute="time", transport=None):
         speed = None
 
         if transport == "walk":
-            speed = 6.0
+            speed = 4.5
         elif transport == "bus":
             speed = 19.5
         elif transport == "bike":
