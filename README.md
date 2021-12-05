@@ -71,6 +71,7 @@ pip install GDAL
 pip install networkx
 pip install shapely
 pip install geopy
+pip install peartree
 ```
 
 ## Usage
