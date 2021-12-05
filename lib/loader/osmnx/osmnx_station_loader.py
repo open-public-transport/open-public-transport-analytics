@@ -89,7 +89,7 @@ warnings.filterwarnings("ignore")
 # Main
 #
 
-class StationLoader:
+class OsmnxStationLoader:
 
     @TrackingDecorator.track_time
     def run(self, logger, results_path, city, transport, clean=False, quiet=False):

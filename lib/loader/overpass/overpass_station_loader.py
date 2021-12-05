@@ -128,7 +128,7 @@ def load_station_json(file_path):
 # Main
 #
 
-class StationLoaderOverpass:
+class OverpassStationLoader:
 
     @TrackingDecorator.track_time
     def run(self, logger, results_path, city, transport, clean=False, quiet=False):

@@ -7,6 +7,7 @@ library_paths = [
     os.path.join(os.getcwd(), "lib"),
     os.path.join(os.getcwd(), "lib", "loader", "osmnx"),
     os.path.join(os.getcwd(), "lib", "loader", "overpass"),
+    os.path.join(os.getcwd(), "lib", "loader", "peartree"),
     os.path.join(os.getcwd(), "lib", "log"),
 ]
 
@@ -17,11 +18,9 @@ for p in library_paths:
 # Import library classes
 from tracking_decorator import TrackingDecorator
 from point_generator import PointGenerator
-from graph_loader import GraphLoader
-from station_loader_overpass import StationLoaderOverpass
-from graph_combiner import GraphCombiner
+from peartree_graph_loader import PeartreeGraphLoader
+from osmnx_graph_loader import OsmnxGraphLoader
 from logger_facade import LoggerFacade
-from isochrone_builder import IsochroneBuilder
 
 
 #
@@ -66,7 +65,6 @@ def main(argv):
 
     # Iterate over cities
     for city in cities:
-
         results_path = os.path.join(base_results_path, city)
 
         # Initialize logger
@@ -84,35 +82,21 @@ def main(argv):
         )
 
         # Load transport graph
-        graph_transport = GraphLoader().run(
+        graph_transport = PeartreeGraphLoader().run(
             logger=logger,
-            results_path=os.path.join(results_path, "graphs"),
+            data_path=data_path,
+            results_path=os.path.join(results_path, "graphs", "peartree"),
             city=city,
-            transport="all",
-            simplify=True,
-            enhance_with_speed=True,
+            start_time=7 * 60 * 60,
+            end_time=8 * 60 * 60,
             clean=clean,
             quiet=quiet
         )
-
-        # Load transport stations
-        stations = StationLoaderOverpass().run(
-            logger=logger,
-            results_path=os.path.join(results_path, "stations"),
-            city=city,
-            transport="all",
-            clean=clean,
-            quiet=quiet
-        )
-
-        if stations is None:
-            logger.log_line(f"✗ Warning: Could not load any stations for {city}. Skip further processing")
-            continue
 
         # Load walk graph
-        graph_walk = GraphLoader().run(
+        graph_walk = OsmnxGraphLoader().run(
             logger=logger,
-            results_path=os.path.join(results_path, "graphs"),
+            results_path=os.path.join(results_path, "graphs", "osmnx"),
             city=city,
             transport="walk",
             simplify=True,
@@ -120,30 +104,6 @@ def main(argv):
             clean=clean,
             quiet=quiet
         )
-
-        # Combine transport graph and walk graph
-        graph = GraphCombiner().run(
-            logger=logger,
-            results_path=os.path.join(results_path, "graphs"),
-            graph_transport=graph_transport,
-            graph_walk=graph_walk,
-            stations=stations,
-            clean=clean,
-            quiet=quiet
-        )
-
-        # Iterate over travel times
-        for travel_time in travel_times:
-            # Generate points
-            IsochroneBuilder().run(
-                logger=logger,
-                results_path=os.path.join(results_path, "geojson"),
-                graph=graph,
-                sample_points=sample_points,
-                travel_time=travel_time,
-                clean=clean,
-                quiet=quiet
-            )
 
 
 if __name__ == "__main__":

@@ -147,7 +147,7 @@ warnings.filterwarnings("ignore")
 # Main
 #
 
-class GraphLoader:
+class OsmnxGraphLoader:
 
     @TrackingDecorator.track_time
     def run(self, logger, results_path, city, transport, simplify=False, enhance_with_speed=False, clean=False,
