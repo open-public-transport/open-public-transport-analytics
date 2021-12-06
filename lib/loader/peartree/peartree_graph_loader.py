@@ -11,7 +11,7 @@ def download_transport_graph(logger, data_path, results_path, city, start_time, 
     try:
         gtfs_path = os.path.join(data_path, city, "gtfs", "GTFS.zip")
         feed = pt.get_representative_feed(gtfs_path)
-        graph_transport = pt.load_feed_as_graph(feed, start_time, end_time, existing_graph)
+        graph_transport = pt.load_feed_as_graph(feed, start_time, end_time, existing_graph, use_multiprocessing=True)
 
         # Save graph
         ox.save_graphml(graph_transport, file_path)
@@ -33,7 +33,7 @@ def load_transport_graph(file_path):
 class PeartreeGraphLoader:
 
     @TrackingDecorator.track_time
-    def run(self, logger, data_path, results_path, city, start_time, end_time, existing_graph, clean=False,
+    def run(self, logger, data_path, results_path, city, start_time, end_time, existing_graph=None, clean=False,
             quiet=False):
         # Make results path
         os.makedirs(os.path.join(results_path), exist_ok=True)
