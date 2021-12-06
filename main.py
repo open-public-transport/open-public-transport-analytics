@@ -35,6 +35,7 @@ def main(argv):
     quiet = False
     num_sample_points = 10_000
     cities = ["berlin", "hamburg"]
+    start_end_times = [(7 * 60 * 60, 8 * 60 * 60)]
     travel_times = [15]
 
     # Read command line arguments
@@ -103,18 +104,36 @@ def main(argv):
             quiet=quiet
         )
 
-        # Load transport graph
-        graph = PeartreeGraphLoader().run(
-            logger=logger,
-            data_path=data_path,
-            results_path=os.path.join(results_path, "graphs", "peartree"),
-            city=city,
-            start_time=7 * 60 * 60,
-            end_time=8 * 60 * 60,
-            existing_graph=graph_walk,
-            clean=clean,
-            quiet=quiet
-        )
+        # Iterate over start/end times
+        for times in start_end_times:
+            start_time= times[0]
+            end_time= times[1]
+
+            # Load transport graph
+            graph = PeartreeGraphLoader().run(
+                logger=logger,
+                data_path=data_path,
+                results_path=os.path.join(results_path, "graphs", "peartree"),
+                city=city,
+                start_time=start_time,
+                end_time=end_time,
+                existing_graph=graph_walk,
+                clean=clean,
+                quiet=quiet
+            )
+
+            # Iterate over travel times
+            for travel_time in travel_times:
+                # Generate points
+                IsochroneBuilder().run(
+                    logger=logger,
+                    results_path=os.path.join(results_path, "geojson"),
+                    graph=graph,
+                    sample_points=sample_points,
+                    travel_time=travel_time,
+                    clean=clean,
+                    quiet=quiet
+                )
 
 
 if __name__ == "__main__":
