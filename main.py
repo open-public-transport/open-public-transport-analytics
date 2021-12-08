@@ -124,7 +124,7 @@ def main(argv):
 
             # Iterate over travel times
             for travel_time in travel_times:
-                # Generate points
+                # Build isochrones
                 IsochroneBuilder().run(
                     logger=logger,
                     results_path=os.path.join(results_path, "geojson"),
