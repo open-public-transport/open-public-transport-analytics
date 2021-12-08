@@ -66,6 +66,10 @@ Install GDAL via Conda package manager (Windows 10, 11 and Ubuntu 20.04)
 conda install -c conda-forge gdal
 ```
 
+```shell
+conda install -c conda-forge poppler=21.09
+```
+
 Install the following dependencies to fulfill the requirements for this project to run.
 
 ```shell script
