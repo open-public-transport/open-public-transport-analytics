@@ -72,6 +72,7 @@ pip install networkx
 pip install shapely
 pip install geopy
 pip install peartree
+pip install fastapi
 ```
 
 ## Usage
