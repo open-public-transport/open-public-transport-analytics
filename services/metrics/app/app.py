@@ -28,15 +28,15 @@ class Metrics:
     def __init__(self, index):
         self.index = index
 
-@app.get("/index")
-def get_mobility_index(lat, lon):
+@app.get("/metrics")
+def get_metrics(lat, lon):
     return Metrics(
         index=random.randint(0, 100)
     )
 
 
-@app.post("/index")
-def post_mobility_index(data: PointOnInterest):
+@app.post("/metrics")
+def post_metrics(data: PointOnInterest):
     data = data.dict()
     lat = data["lat"]
     lon = data["lon"]
