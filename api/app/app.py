@@ -63,7 +63,7 @@ class TravelDistanceInformation:
     absolute_avg_isochrone_area_rank: RankedValue = RankedValue(),
 
 
-class Place:
+class PlaceMetrics:
     mobility_index = random.randint(0, 100)
     station_information: list[StationInformation] = []
     line_information: list[LineInformation] = []
@@ -71,7 +71,7 @@ class Place:
     pass
 
 
-class City:
+class CityMetrics:
     city_basic_information: CityBasicInformation = {}
     station_information: list[StationInformation] = []
     travel_distance_information: list[TravelDistanceInformation] = []
@@ -100,7 +100,7 @@ def get_isochrones(city, transport):
 @app.get("/place")
 def get_metrics(lat, lon):
     # TODO Implement
-    return Place()
+    return PlaceMetrics()
 
 
 @app.get("/isochrone")
@@ -117,5 +117,5 @@ def get_isochrones(lat, lon, transport):
 def get_cities():
     # TODO Implement
     return [
-        City()
+        CityMetrics()
     ]
