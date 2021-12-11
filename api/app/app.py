@@ -2,7 +2,6 @@ import random
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 app = FastAPI()
 app.add_middleware(
@@ -17,64 +16,65 @@ app.add_middleware(
 )
 
 
-class PointOnInterest(BaseModel):
-    lat = 0
-    lon = 0
-
-
 class CityBasicInformation:
-    city_name = ""
-    federal_state_name = ""
-    group = "",
-    inhabitants = -1,
-    area = -1,
-    population_density = -1,
+    def __init__(self):
+        self.city_name = ""
+        self.federal_state_name = ""
+        self.group = "",
+        self.inhabitants = -1,
+        self.area = -1,
+        self.population_density = -1,
 
 
 class RankedValue:
-    raw_value = -1
-    overall_rank = -1  # Rank across all cities
-    grouped_rank = -1  # Rank across cities of same group, e.g. metropolis, small town
-    overall_percentile = -1  # Percentile across all cities
-    grouped_percentile = -1  # Percentile across cities of same group, e.g. metropolis, small town
+    def __init__(self):
+        self.raw_value = -1
+        self.overall_rank = -1  # Rank across all cities
+        self.grouped_rank = -1  # Rank across cities of same group, e.g. metropolis, small town
+        self.overall_percentile = -1  # Percentile across all cities
+        self.grouped_percentile = -1  # Percentile across cities of same group, e.g. metropolis, small town
 
 
 class StationInformation:
-    transport_type = ""  # all, bus, light_rail, subway, tram
-    absolute_stations_count: RankedValue = RankedValue(),
-    absolute_stations_accessibility_count: RankedValue = RankedValue(),
-    relative_stations_accessibility_percentage: RankedValue = RankedValue(),
-    relative_stations_per_sqkm: RankedValue = RankedValue(),
-    relative_stations_per_inhabitant: RankedValue = RankedValue(),
+    def __init__(self):
+        self.transport_type = ""  # all, bus, light_rail, subway, tram
+        self.absolute_stations_count: RankedValue = RankedValue(),
+        self.absolute_stations_accessibility_count: RankedValue = RankedValue(),
+        self.relative_stations_accessibility_percentage: RankedValue = RankedValue(),
+        self.relative_stations_per_sqkm: RankedValue = RankedValue(),
+        self.relative_stations_per_inhabitant: RankedValue = RankedValue(),
 
 
 class LineInformation:
-    transport_type = ""  # all, bus, light_rail, subway, tram
-    absolute_line_count: RankedValue = RankedValue(),
-    absolute_line_accessibility_count: RankedValue = RankedValue(),
-    relative_line_accessibility_percentage: RankedValue = RankedValue(),
-    relative_line_per_sqkm: RankedValue = RankedValue(),
-    relative_line_per_inhabitant: RankedValue = RankedValue(),
+    def __init__(self):
+        self.transport_type = ""  # all, bus, light_rail, subway, tram
+        self.absolute_line_count: RankedValue = RankedValue(),
+        self.absolute_line_accessibility_count: RankedValue = RankedValue(),
+        self.relative_line_accessibility_percentage: RankedValue = RankedValue(),
+        self.relative_line_per_sqkm: RankedValue = RankedValue(),
+        self.relative_line_per_inhabitant: RankedValue = RankedValue(),
 
 
 class TravelDistanceInformation:
-    transport_type = ""  # all, bus, light_rail, subway, tram
-    absolute_avg_isochrone_area: RankedValue = RankedValue(),
-    absolute_avg_isochrone_area_rank: RankedValue = RankedValue(),
+    def __init__(self):
+        self.transport_type = ""  # all, bus, light_rail, subway, tram
+        self.absolute_avg_isochrone_area: RankedValue = RankedValue(),
+        self.absolute_avg_isochrone_area_rank: RankedValue = RankedValue(),
 
 
 class PlaceMetrics:
-    mobility_index = random.randint(0, 100)
-    station_information: list[StationInformation] = []
-    line_information: list[LineInformation] = []
-    travel_distance_information: list[TravelDistanceInformation] = []
-    pass
+    def __init__(self):
+        self.mobility_index = random.randint(0, 100)
+        self.station_information: list[StationInformation] = []
+        self.line_information: list[LineInformation] = []
+        self.travel_distance_information: list[TravelDistanceInformation] = []
 
 
 class CityMetrics:
-    city_basic_information: CityBasicInformation = {}
-    station_information: list[StationInformation] = []
-    travel_distance_information: list[TravelDistanceInformation] = []
+    def __init__(self):
+        self.city_basic_information: CityBasicInformation = {}
+        self.station_information: list[StationInformation] = []
+        self.travel_distance_information: list[TravelDistanceInformation] = []
 
 
 #
