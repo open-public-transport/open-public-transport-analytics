@@ -72,16 +72,16 @@ class TravelDistanceInformation:
 
 class Place:
     mobility_index = random.randint(0, 100)
-    stationInformation: list[StationInformation] = []
-    lineInformation: list[LineInformation] = []
-    travelDistanceInformation: list[TravelDistanceInformation] = []
+    station_information: list[StationInformation] = []
+    line_information: list[LineInformation] = []
+    travel_distance_information: list[TravelDistanceInformation] = []
     pass
 
 
 class City:
-    cityBasicInformation: CityBasicInformation = {}
-    stationInformation: list[StationInformation] = []
-    travelDistanceInformation: list[TravelDistanceInformation] = []
+    city_basic_information: CityBasicInformation = {}
+    station_information: list[StationInformation] = []
+    travel_distance_information: list[TravelDistanceInformation] = []
 
 
 #
