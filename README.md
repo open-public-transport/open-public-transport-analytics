@@ -75,7 +75,7 @@ pip install peartree
 pip install fastapi
 ```
 
-## Usage
+## Usage (analysis)
 
 Run this command to start the main script.
 
@@ -90,6 +90,17 @@ python main.py [OPTION]...
 Examples:
   python main.py -c -p 10000
 ```
+
+## Usage (web server)
+
+Run this command to run the web server locally.
+
+```shell script
+cd ./api/app
+uvicorn app:app --reload
+```
+
+Open http://localhost:8000/docs#/ to see the OpenAPI specification.
 
 ## Roadmap
 
