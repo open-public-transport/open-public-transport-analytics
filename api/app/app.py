@@ -22,13 +22,6 @@ class PointOnInterest(BaseModel):
     lon = 0
 
 
-class Metrics:
-    mobility_index = 0
-
-    def __init__(self, mobility_index):
-        self.mobility_index = mobility_index
-
-
 class CityBasicInformation:
     city_name = ""
     federal_state_name = ""
