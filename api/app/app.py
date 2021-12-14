@@ -8,6 +8,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:4200",
+        "https://open-public-transport-qa.web.app",
         "https://openpublictransport.de",
     ],
     allow_credentials=True,
