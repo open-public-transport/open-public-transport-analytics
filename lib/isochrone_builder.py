@@ -5,7 +5,7 @@ import networkx as nx
 import numpy as np
 import osmnx as ox
 from geojson import FeatureCollection
-from shapely.geometry import MultiPoint
+from shapely.geometry import MultiPoint, Polygon
 from tqdm import tqdm
 
 from tracking_decorator import TrackingDecorator
@@ -22,19 +22,26 @@ def get_spatial_distance(logger, graph, start_point, travel_time, distance_attri
         )
 
         longitudes, latitudes = get_convex_hull(nodes=nodes)
+        points = []
+        for point in zip(latitudes, longitudes):
+            points.append([point[0],point[1]]) 
+        
+        polygon = Polygon(points)
+
         transport_distances_meters = get_distances(start_point=start_point, latitudes=latitudes, longitudes=longitudes)
 
         return np.mean(transport_distances_meters) + walking_distance_meters, \
                np.median(transport_distances_meters) + walking_distance_meters, \
                np.min(transport_distances_meters) + walking_distance_meters, \
-               np.max(transport_distances_meters) + walking_distance_meters
+               np.max(transport_distances_meters) + walking_distance_meters, \
+                polygon.area
     except Exception as e:
         logger.log_line(f"✗️ Exception: {str(e)}")
-        return 0, 0, 0, 0
+        return 0, 0, 0, 0, 0
 
 
 def get_possible_routes(graph, start_point, travel_time, distance_attribute, calculate_walking_distance=False):
-    center_node, distance_to_station_meters = ox.nearest_nodes(
+    center_node, distance_to_nearest_node = ox.nearest_nodes(
         G=graph,
         X=start_point[1],
         Y=start_point[0],
@@ -43,7 +50,7 @@ def get_possible_routes(graph, start_point, travel_time, distance_attribute, cal
 
     if calculate_walking_distance:
         walking_speed_meters_per_minute = 100
-        walking_time_minutes = distance_to_station_meters / walking_speed_meters_per_minute
+        walking_time_minutes = distance_to_nearest_node / walking_speed_meters_per_minute
 
         walking_time_minutes_max = walking_time_minutes if walking_time_minutes < travel_time else travel_time
         walking_distance_meters = walking_time_minutes_max * walking_speed_meters_per_minute
@@ -117,7 +124,8 @@ class IsochroneBuilder:
             mean_spatial_distance, \
             median_spatial_distance, \
             min_spatial_distance, \
-            max_spatial_distance = get_spatial_distance(
+            max_spatial_distance, \
+                area = get_spatial_distance(
                 logger=logger,
                 graph=graph,
                 start_point=start_point,
@@ -130,7 +138,8 @@ class IsochroneBuilder:
                 "mean_spatial_distance_" + str(travel_time) + "min": mean_spatial_distance,
                 "median_spatial_distance_" + str(travel_time) + "min": median_spatial_distance,
                 "min_spatial_distance_" + str(travel_time) + "min": min_spatial_distance,
-                "max_spatial_distance_" + str(travel_time) + "min": max_spatial_distance
+                "max_spatial_distance_" + str(travel_time) + "min": max_spatial_distance,
+                "area_" + str(travel_time) + "min": area
             }
 
             if mean_spatial_distance > 0:
