@@ -91,6 +91,8 @@ def write_points_to_geojson(file_path, coords, travel_time):
                 "min_spatial_distance_" + str(travel_time) + "min"],
             "max_spatial_distance_" + str(travel_time) + "min": coord[
                 "max_spatial_distance_" + str(travel_time) + "min"],
+            "area_" + str(travel_time) + "min": coord[
+                "area_" + str(travel_time) + "min"],
         }
         features.append(feature)
 
