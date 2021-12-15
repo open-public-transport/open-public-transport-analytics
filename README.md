@@ -103,6 +103,15 @@ uvicorn app:app --reload
 
 Open http://localhost:8000/docs#/ to see the OpenAPI specification.
 
+## Fix graphml files
+
+In some occasions graphml files created by peartree cannot be loaded since their IDs have a weird format, such as _
+
+```shell
+cd results/results/<CITY>/graphs/peartree
+sed -E -i '.bak' 's/\"[A-z0-9 ]+[_de]+([0-9]*):*([0-9]*):*([0-9]*):*([0-9]*):*([0-9]*)[_G]*\"/\1\2\3\4\5\"/g' <GRAPH_FILE>
+```
+
 ## Roadmap
 
 See the [open issues](https://github.com/open-public-transport/open-public-transport-analytics/issues) for a list of proposed features (and
