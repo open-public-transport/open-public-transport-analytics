@@ -124,6 +124,18 @@ def main(argv):
             quiet=quiet
         )
 
+        for means_of_transportation in ["bus", "subway", "light_train", "tram"]:
+            # Load routes
+            OverpassRouteLoader().run(
+                logger=logger,
+                results_path=results_path,
+                city=city_name,
+                bounding_box=bounding_box,
+                transport=means_of_transportation,
+                clean=clean,
+                quiet=quiet
+            )
+
         # Load walk graph
         graph_walk = OsmnxGraphLoader().run(
             logger=logger,
