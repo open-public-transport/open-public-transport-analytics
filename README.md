@@ -73,6 +73,7 @@ pip install shapely
 pip install geopy
 pip install peartree
 pip install fastapi
+pip install osm2geojson
 ```
 
 ## Usage (analysis)
