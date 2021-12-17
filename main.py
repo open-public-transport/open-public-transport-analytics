@@ -24,6 +24,7 @@ from graph_transformer import GraphTransformer
 from logger_facade import LoggerFacade
 from isochrone_builder import IsochroneBuilder
 
+
 #
 # Main
 #
@@ -34,7 +35,26 @@ def main(argv):
     clean = False
     quiet = False
     num_sample_points = 10_000
-    cities = ["berlin", "hamburg"]
+    cities = [
+        {"name": "berlin", "query": "Berlin, Germany", "transport_association": "vbb"},
+        {"name": "bonn", "query": "Bonn, Germany", "transport_association": "vrs"},
+        {"name": "bochum", "query": "Bochum, Germany", "transport_association": "vrr"},
+        # {"name": "bremen", "query": "Bremen, Germany", "transport_association": None },
+        {"name": "cottbus", "query": "Cottbus, Germany", "transport_association": "vbb"},
+        {"name": "dortmund", "query": "Dortmund, Germany", "transport_association": "vrr"},
+        {"name": "duesseldorf", "query": "Düsseldorf, Germany", "transport_association": "vrr"},
+        {"name": "duisburg", "query": "Duisburg, Germany", "transport_association": "vrr"},
+        # {"name": "frankfurt-main", "query": "Frankfurt (Main), Germany", "transport_association": None},
+        {"name": "frankfurt-oder", "query": "Frankfurt (Oder), Germany", "transport_association": "vbb"},
+        {"name": "hamburg", "query": "Hamburg, Germany", "transport_association": "hhv"},
+        {"name": "hamm", "query": "Hamm, Germany", "transport_association": "vrr"},
+        {"name": "koeln", "query": "Köln, Germany", "transport_association": "vrs"},
+        {"name": "muenchen", "query": "München, Germany", "transport_association": "mvv"},
+        {"name": "muenster", "query": "Münster, Germany", "transport_association": "nwl "},
+        {"name": "potsdam", "query": "Potsdam, Germany", "transport_association": "vbb"},
+        {"name": "stuttgart", "query": "Stuttgart, Germany", "transport_association": "vvs"},
+        {"name": "wuppertal", "query": "Wuppertal, Germany", "transport_association": "vrr"},
+    ]
     start_end_times = [(7 * 60 * 60, 8 * 60 * 60)]
     travel_times = [15]
 
@@ -67,7 +87,12 @@ def main(argv):
 
     # Iterate over cities
     for city in cities:
-        results_path = os.path.join(base_results_path, city)
+
+        city_name = city["name"]
+        query = city["query"]
+        transport_association = city["transport_association"]
+
+        results_path = os.path.join(base_results_path, city_name)
 
         # Initialize logger
         logger = LoggerFacade(results_path, console=True, file=True)
@@ -77,7 +102,7 @@ def main(argv):
             logger=logger,
             data_path=data_path,
             results_path=os.path.join(results_path, "sample-points"),
-            city=city,
+            city=city_name,
             num_sample_points=num_sample_points,
             clean=clean,
             quiet=quiet
@@ -87,7 +112,7 @@ def main(argv):
         graph_walk = OsmnxGraphLoader().run(
             logger=logger,
             results_path=os.path.join(results_path, "graphs", "osmnx"),
-            city=city,
+            query=query,
             transport="walk",
             simplify=True,
             enhance_with_speed=True,
@@ -106,15 +131,15 @@ def main(argv):
 
         # Iterate over start/end times
         for times in start_end_times:
-            start_time= times[0]
-            end_time= times[1]
+            start_time = times[0]
+            end_time = times[1]
 
             # Load transport graph
             graph = PeartreeGraphLoader().run(
                 logger=logger,
                 data_path=data_path,
                 results_path=os.path.join(results_path, "graphs", "peartree"),
-                city=city,
+                transport_association=transport_association,
                 start_time=start_time,
                 end_time=end_time,
                 existing_graph=graph_walk,

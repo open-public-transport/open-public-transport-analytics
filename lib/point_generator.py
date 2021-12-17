@@ -156,7 +156,7 @@ class PointGenerator:
         if clean or not os.path.exists(os.path.join(results_path, "sample-points.json")):
 
             # Define valid polygons
-            polygon_file = os.path.join(data_path, city, "boundary", "districts.geojson")
+            polygon_file = os.path.join(data_path, "cities", city, "boundaries", "boundaries.geojson")
             valid_polygons = get_polygons(read_geojson(polygon_file))
 
             # Define invalid polygons
@@ -164,7 +164,7 @@ class PointGenerator:
             for invalid_polygon in ["cemetery.geojson", "farmland.geojson", "farmyard.geojson", "forest.geojson",
                                     "garden.geojson", "park.geojson", "recreation_ground.geojson", "water.geojson",
                                     "wood.geojson"]:
-                polygon_file = os.path.join(data_path, city, "landuse", invalid_polygon)
+                polygon_file = os.path.join(data_path, "cities", city, "landuse", invalid_polygon)
                 if os.path.exists(polygon_file):
                     invalid_polygons += get_polygons(read_geojson(polygon_file))
 
