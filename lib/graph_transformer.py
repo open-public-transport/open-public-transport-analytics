@@ -13,7 +13,7 @@ def transform_graph(graph):
         data["length"] = length / 1_000 / speed * 60 * 60
 
     for i, node in graph.nodes(data=True):
-        graph.node[i]["boarding_cost"] = 0
+        node["boarding_cost"] = 0
 
     return graph
 
