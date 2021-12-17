@@ -1,3 +1,4 @@
+import json
 import os.path
 
 import geopy.distance
@@ -5,13 +6,14 @@ import networkx as nx
 import numpy as np
 import osmnx as ox
 from geojson import FeatureCollection
+from osgeo import ogr
 from shapely.geometry import MultiPoint, Polygon
 from tqdm import tqdm
 
 from tracking_decorator import TrackingDecorator
 
 
-def get_spatial_distance(logger, graph, start_point, travel_time, distance_attribute="time"):
+def get_spatial_distance(logger, data_path, city, graph, start_point, travel_time, distance_attribute="time"):
     try:
         nodes, edges, walking_distance_meters = get_possible_routes(
             graph=graph,
@@ -21,12 +23,22 @@ def get_spatial_distance(logger, graph, start_point, travel_time, distance_attri
             calculate_walking_distance=True
         )
 
+        # Define valid polygons
+        polygon_file = os.path.join(data_path, "cities", city, "boundaries", "boundaries.geojson")
+        valid_polygons = get_polygons(read_geojson(polygon_file))
+
         longitudes, latitudes = get_convex_hull(nodes=nodes)
         points = []
         for point in zip(latitudes, longitudes):
-            points.append([point[0],point[1]]) 
-        
-        polygon = Polygon(points)
+
+            p = ogr.Geometry(ogr.wkbPoint)
+            p.AddPoint(point[0], point[1])
+
+            # Check if point is within city limits
+            if is_in_desired_area(p, valid_polygons):
+                points.append([point[0], point[1]])
+
+        convex_hull_polygon = Polygon(points)
 
         transport_distances_meters = get_distances(start_point=start_point, latitudes=latitudes, longitudes=longitudes)
 
@@ -34,10 +46,39 @@ def get_spatial_distance(logger, graph, start_point, travel_time, distance_attri
                np.median(transport_distances_meters) + walking_distance_meters, \
                np.min(transport_distances_meters) + walking_distance_meters, \
                np.max(transport_distances_meters) + walking_distance_meters, \
-                polygon.area
+               convex_hull_polygon.area
     except Exception as e:
         logger.log_line(f"✗️ Exception: {str(e)}")
         return 0, 0, 0, 0, 0
+
+
+def is_in_desired_area(point, valid_polygons):
+    for polygon in valid_polygons:
+        if point.Within(polygon):
+            return True
+
+    return False
+
+
+def read_geojson(file_path):
+    file = open(file_path)
+    return json.load(file)
+
+
+def get_polygons(geojson):
+    polygons = []
+
+    # Extract polygons from inhabitants file
+    features = geojson["features"]
+
+    for feature in features:
+        geom = feature["geometry"]
+        geom = json.dumps(geom)
+        polygon = ogr.CreateGeometryFromJson(geom)
+
+        polygons.append(polygon)
+
+    return polygons
 
 
 def get_possible_routes(graph, start_point, travel_time, distance_attribute, calculate_walking_distance=False):
@@ -109,7 +150,7 @@ def write_points_to_geojson(file_path, coords, travel_time):
 class IsochroneBuilder:
 
     @TrackingDecorator.track_time
-    def run(self, logger, results_path, graph, sample_points, travel_time, clean=False, quiet=False):
+    def run(self, logger, data_path, results_path, city, graph, sample_points, travel_time, clean=False, quiet=False):
         points_with_spatial_distance = []
         failed_points = []
 
@@ -127,8 +168,10 @@ class IsochroneBuilder:
             median_spatial_distance, \
             min_spatial_distance, \
             max_spatial_distance, \
-                area = get_spatial_distance(
+            area = get_spatial_distance(
                 logger=logger,
+                data_path=data_path,
+                city=city,
                 graph=graph,
                 start_point=start_point,
                 travel_time=travel_time

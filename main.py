@@ -8,6 +8,7 @@ library_paths = [
     os.path.join(os.getcwd(), "lib", "loader", "osmnx"),
     os.path.join(os.getcwd(), "lib", "loader", "overpass"),
     os.path.join(os.getcwd(), "lib", "loader", "peartree"),
+    os.path.join(os.getcwd(), "lib", "converter"),
     os.path.join(os.getcwd(), "lib", "log"),
 ]
 
@@ -20,6 +21,7 @@ from tracking_decorator import TrackingDecorator
 from point_generator import PointGenerator
 from peartree_graph_loader import PeartreeGraphLoader
 from osmnx_graph_loader import OsmnxGraphLoader
+from overpass_route_loader import OverpassRouteLoader
 from graph_transformer import GraphTransformer
 from logger_facade import LoggerFacade
 from isochrone_builder import IsochroneBuilder
@@ -36,37 +38,43 @@ def main(argv):
     quiet = False
     points_per_sqkm = 100
     cities = [
-        {"name": "berlin", "query": "Berlin, Germany", "area": 891, "inhabitants": 3_600_000,
+        {"name": "berlin", "query": "Berlin, Germany",
+         "bounding_box": [13.088333218007715, 52.33824183586156, 13.759587218876971, 52.67491714954712], "area": 891,
+         "inhabitants": 3_600_000,
          "transport_association": "vbb"},
-        {"name": "bonn", "query": "Bonn, Germany", "area": 141, "inhabitants": 330_000, "transport_association": "vrs"},
-        {"name": "bochum", "query": "Bochum, Germany", "area": 145, "inhabitants": 364_000,
-         "transport_association": "vrr"},
-        # {"name": "bremen", "query": "Bremen, Germany", "area": 318, "inhabitants": 566_000, "transport_association": None },
-        {"name": "cottbus", "query": "Cottbus, Germany", "area": 165, "inhabitants": 89_000,
-         "transport_association": "vbb"},
-        {"name": "dortmund", "query": "Dortmund, Germany", "area": 280, "inhabitants": 597_000,
-         "transport_association": "vrr"},
-        {"name": "duesseldorf", "query": "Düsseldorf, Germany", "area": 217, "inhabitants": 620_000,
-         "transport_association": "vrr"},
-        {"name": "duisburg", "query": "Duisburg, Germany", "area": 232, "inhabitants": 495_000,
-         "transport_association": "vrr"},
-        # {"name": "frankfurt-main", "query": "Frankfurt (Main), Germany", "area": 248, "inhabitants": 764_000, "transport_association": None},
-        {"name": "frankfurt-oder", "query": "Frankfurt (Oder), Germany", "area": 147, "inhabitants": 57_000,
-         "transport_association": "vbb"},
-        {"name": "hamburg", "query": "Hamburg, Germany", "area": 755, "inhabitants": 1_851_000,
-         "transport_association": "hhv"},
-        {"name": "hamm", "query": "Hamm, Germany", "area": 226, "inhabitants": 178_000, "transport_association": "vrr"},
-        {"name": "koeln", "query": "Köln, Germany", "area": 405, "inhabitants": 1_083_000,
+        {"name": "bonn", "query": "Bonn, Germany", "bounding_box": None, "area": 141, "inhabitants": 330_000,
          "transport_association": "vrs"},
-        {"name": "muenchen", "query": "München, Germany", "area": 310, "inhabitants": 1_488_000,
-         "transport_association": "mvv"},
-        {"name": "muenster", "query": "Münster, Germany", "area": 303, "inhabitants": 316_000,
-         "transport_association": "nwl "},
-        {"name": "potsdam", "query": "Potsdam, Germany", "area": 188, "inhabitants": 182_000,
+        {"name": "bochum", "query": "Bochum, Germany", "bounding_box": None, "area": 145, "inhabitants": 364_000,
+         "transport_association": "vrr"},
+        # {"name": "bremen", "query": "Bremen, Germany", "bounding_box": None, "area": 318, "inhabitants": 566_000, "transport_association": None },
+        {"name": "cottbus", "query": "Cottbus, Germany", "bounding_box": None, "area": 165, "inhabitants": 89_000,
          "transport_association": "vbb"},
-        {"name": "stuttgart", "query": "Stuttgart, Germany", "area": 207, "inhabitants": 630_000,
+        {"name": "dortmund", "query": "Dortmund, Germany", "bounding_box": None, "area": 280, "inhabitants": 597_000,
+         "transport_association": "vrr"},
+        {"name": "duesseldorf", "query": "Düsseldorf, Germany", "bounding_box": None, "area": 217,
+         "inhabitants": 620_000,
+         "transport_association": "vrr"},
+        {"name": "duisburg", "query": "Duisburg, Germany", "bounding_box": None, "area": 232, "inhabitants": 495_000,
+         "transport_association": "vrr"},
+        # {"name": "frankfurt-main", "query": "Frankfurt (Main), Germany", "bounding_box": None, "area": 248, "inhabitants": 764_000, "transport_association": None},
+        {"name": "frankfurt-oder", "query": "Frankfurt (Oder), Germany", "bounding_box": None, "area": 147,
+         "inhabitants": 57_000,
+         "transport_association": "vbb"},
+        {"name": "hamburg", "query": "Hamburg, Germany", "bounding_box": None, "area": 755, "inhabitants": 1_851_000,
+         "transport_association": "hhv"},
+        {"name": "hamm", "query": "Hamm, Germany", "bounding_box": None, "area": 226, "inhabitants": 178_000,
+         "transport_association": "vrr"},
+        {"name": "koeln", "query": "Köln, Germany", "bounding_box": None, "area": 405, "inhabitants": 1_083_000,
+         "transport_association": "vrs"},
+        {"name": "muenchen", "query": "München, Germany", "bounding_box": None, "area": 310, "inhabitants": 1_488_000,
+         "transport_association": "mvv"},
+        {"name": "muenster", "query": "Münster, Germany", "bounding_box": None, "area": 303, "inhabitants": 316_000,
+         "transport_association": "nwl "},
+        {"name": "potsdam", "query": "Potsdam, Germany", "bounding_box": None, "area": 188, "inhabitants": 182_000,
+         "transport_association": "vbb"},
+        {"name": "stuttgart", "query": "Stuttgart, Germany", "bounding_box": None, "area": 207, "inhabitants": 630_000,
          "transport_association": "vvs"},
-        {"name": "wuppertal", "query": "Wuppertal, Germany", "area": 168, "inhabitants": 355_000,
+        {"name": "wuppertal", "query": "Wuppertal, Germany", "bounding_box": None, "area": 168, "inhabitants": 355_000,
          "transport_association": "vrr"},
     ]
     start_end_times = [(7 * 60 * 60, 8 * 60 * 60)]
@@ -104,6 +112,7 @@ def main(argv):
 
         city_name = city["name"]
         query = city["query"]
+        bounding_box = city["bounding_box"]
         area = city["area"]
         inhabitants = city["inhabitants"]
         transport_association = city["transport_association"]
@@ -180,7 +189,9 @@ def main(argv):
                 # Build isochrones
                 IsochroneBuilder().run(
                     logger=logger,
+                    data_path=data_path,
                     results_path=os.path.join(results_path, "geojson"),
+                    city=city_name,
                     graph=graph,
                     sample_points=sample_points,
                     travel_time=travel_time,
