@@ -18,7 +18,7 @@ def download_transport_graph(logger, data_path, results_path, transport_associat
 
         # Save graph
         ox.save_graphml(graph_transport, file_path)
-        nx.write_graphml(graph_transport, file_path_nx)
+        # nx.write_graphml(graph_transport, file_path_nx)
 
         return graph_transport
     except Exception as e:
