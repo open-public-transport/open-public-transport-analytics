@@ -93,6 +93,14 @@ def main(argv):
          "bounding_box": [7.01407471400006, 51.165736174000074, 7.313426359000061, 51.31809703300007],
          "transport_association": "vrr"},
     ]
+    cities = [
+        {"name": "berlin", "query": "Berlin, Germany", "area": 891, "inhabitants": 3_600_000,
+         "bounding_box": [13.088333218007715, 52.33824183586156, 13.759587218876971, 52.67491714954712],
+         "transport_association": "vbb"},
+        {"name": "hamburg", "query": "Hamburg, Germany", "area": 755, "inhabitants": 1_851_000,
+         "bounding_box": [9.73031519588174, 53.39507758854026, 10.325959157503767, 53.73808674380358],
+         "transport_association": "hhv"}
+    ]
     start_end_times = [(7 * 60 * 60, 8 * 60 * 60)]
     travel_times = [15]
 
@@ -153,7 +161,7 @@ def main(argv):
             # Load routes
             OverpassRouteLoader().run(
                 logger=logger,
-                results_path=results_path,
+                results_path=os.path.join(results_path, "geojson"),
                 city=city_name,
                 bounding_box=bounding_box,
                 transport=means_of_transportation,
