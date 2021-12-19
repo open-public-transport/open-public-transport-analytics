@@ -1,7 +1,9 @@
 import random
 
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from shapely.geometry import Point #, Polygon
 
 app = FastAPI()
 app.add_middleware(
@@ -16,16 +18,55 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+### Storage Methods to Load from firebase
+#
+#
+#
+#-------------------------------------------------------------------------------
+# Imports
+def load_data_from_firebase():
+    '''
+    Connect to the Firebase Storage and load data to stateless container
+    '''
+    import pyrebase
+    import os
+
+    #-------------------------------------------------------------------------------
+    # Variables & Setup
+    filelist = [ f for f in os.listdir(".") if f.endswith(".JPG") ]
+    for f in filelist:
+        os.remove(os.path.join(".", f))
+
+    config = {
+        "apiKey": "API Key",
+        "authDomain": "authdomain",
+        "databaseURL": "https://??????.firebaseio.com",
+        "projectId": "??????",
+        "storageBucket": "????????.appspot.com",
+        "serviceAccount": "serviceAccountKey.json"
+    }
+
+    firebase_storage = pyrebase.initialize_app(config)
+    storage = firebase_storage.storage()
+
+    #-------------------------------------------------------------------------------
+    # Uploading And Downloading Images
+
+    # storage.child("Guitar.JPG").put("Guitar.JPG")
+    # storage.child("PlayingGuitar.JPG").download("PlayingGuitar.JPG")
+
+    all_files = storage.list_files()
+
+    # Download all Files to local dir in the stateless container
+    for file in all_files:
+        print(file.name)
+        file.download_to_filename(file.name)
 
 ### LOAD GRAPHS ###
 #
 #
 #
 #
-
-
-
-
 
 class CityBasicInformation:
     def __init__(self):
@@ -120,22 +161,59 @@ def get_metrics(lat, lon):
 
 
     Parameters
+    ----------
         lat: float
         lon: float
     Return
-        returns an PlaceMetricsObject witch includes Stationinformation, Lineinformation, IndexScore and TravelDistanceInformation
+    ------
+        returns an PlaceMetricsObject witch includes Stationinformation (as List), Lineinformation (as List), IndexScore and TravelDistanceInformation
     '''
     # TODO Implement methode to find nearby stations
-    def find_nearby_stations():
+    def find_nearby_stations(lat,lon,data):
         '''
         It is nessecary to define an methode to find nearby stations.
         Load an geojson with stations and find some stuff.
-        
+        Parameters
+        ----------
+        lat: float
+        lon: float
+        data: GeoDataFrame - GeoJSON
+
         Return
         ------
         List: 
             of Stationinformation Classobjects
         '''
+        point = Point(lat, lon)
+
+        # create your circle buffer from one of the points
+        # 
+        # distance = 0.00001
+        distance = 0.0001
+        #distance = 0.001
+        #distance = 0.01
+        circle_buffer = point.buffer(distance)
+        count = 0
+        #### VERSION ONE WITHIN #### 
+        for geom in data.geometry:
+            #print(geom)
+            if geom.within(circle_buffer):
+                count = count + 1
+                #print('point 2 is within the distance buffer of point 1')
+                pass
+        print(count)
+
+        '''
+        #### VERSION TWO BUFFER RADIUS CONTAINS ####
+        for geom in df_stations.geometry:
+            if circle_buffer.contains(geom):
+                count = count + 1
+                #print('circle buffer contains point 2')
+                pass
+        print(count) 
+        '''
+        # TODO implement return Objectstructure like GEOM + id + description ... id is nessecary to take and reference the lines
+        #print(point_1)
         pass
 
     # TODO Implement methode to find nearby lines

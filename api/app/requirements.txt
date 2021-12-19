@@ -3,3 +3,5 @@ fastapi
 numpy
 pandas
 osmnx
+pyrebase
+shapely
