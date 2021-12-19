@@ -6,17 +6,44 @@ import requests
 from tracking_decorator import TrackingDecorator
 
 
-def download_route_json(logger, file_path, bounding_box, transport):
+def download_station_json(logger, file_path, bounding_box, transport):
     bbox = f"({bounding_box[1]}, {bounding_box[0]}, {bounding_box[3]}, {bounding_box[2]})"
 
     try:
-        data = f"""
+        if transport == "bus":
+            data = f"""
 [out:json][timeout:25];
 (
-  relation["route"~"{transport}"]{bbox};  
+  node["highway"~"bus_stop"]{bbox};  
 );
 out geom;
-"""
+                """
+        elif transport == "light_rail":
+            data = f"""
+[out:json][timeout:25];
+(
+  node["railway"~"station|halt"]["station"~"light_rail"]{bbox};  
+);
+out geom;
+                """
+        elif transport == "subway":
+            data = f"""
+[out:json][timeout:25];
+(
+  node["railway"~"station|halt"]["station"~"subway"]{bbox};  
+);
+out geom;
+                """
+        elif transport == "tram":
+            data = f"""
+[out:json][timeout:25];
+(
+  node["railway"~"tram_stop"]{bbox};  
+);
+out geom;
+                """
+        else:
+            raise Exception
 
         formatted_data = quote(data.lstrip("\n"))
 
@@ -49,7 +76,7 @@ def load_json(file_path):
 # Main
 #
 
-class OverpassRouteLoader:
+class OverpassStationLoader:
 
     @TrackingDecorator.track_time
     def run(self, logger, results_path, city, bounding_box, transport, clean=False, quiet=False):
@@ -57,13 +84,13 @@ class OverpassRouteLoader:
         os.makedirs(os.path.join(results_path), exist_ok=True)
 
         # Define file path
-        file_path = os.path.join(results_path, "routes-" + transport + ".json")
+        file_path = os.path.join(results_path, "stations-" + transport + ".json")
 
         # Check if result needs to be generated
         if clean or not os.path.exists(file_path):
 
             # Download json
-            json_content = download_route_json(
+            json_content = download_station_json(
                 logger=logger,
                 file_path=file_path,
                 bounding_box=bounding_box,
@@ -72,7 +99,7 @@ class OverpassRouteLoader:
 
             if json_content is not None:
                 if not quiet:
-                    logger.log_line(f"✓ Download {city} route {transport}")
+                    logger.log_line(f"✓ Download {city} station {transport}")
 
                 return json_content
             else:
@@ -82,6 +109,6 @@ class OverpassRouteLoader:
             json_content = load_json(file_path=file_path)
 
             if not quiet:
-                logger.log_line(f"✓ Load {city} route {transport}")
+                logger.log_line(f"✓ Load {city} station {transport}")
 
             return json_content

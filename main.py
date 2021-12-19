@@ -2,15 +2,18 @@ import getopt
 import os
 import sys
 
+file_path = os.path.realpath(__file__)
+script_path = os.path.dirname(file_path)
+
 # Make library available in path
 library_paths = [
-    os.path.join(os.getcwd(), "lib"),
-    os.path.join(os.getcwd(), "lib", "cloud"),
-    os.path.join(os.getcwd(), "lib", "loader", "osmnx"),
-    os.path.join(os.getcwd(), "lib", "loader", "overpass"),
-    os.path.join(os.getcwd(), "lib", "loader", "peartree"),
-    os.path.join(os.getcwd(), "lib", "converter"),
-    os.path.join(os.getcwd(), "lib", "log"),
+    os.path.join(script_path, "lib"),
+    os.path.join(script_path, "lib", "cloud"),
+    os.path.join(script_path, "lib", "loader", "osmnx"),
+    os.path.join(script_path, "lib", "loader", "overpass"),
+    os.path.join(script_path, "lib", "loader", "peartree"),
+    os.path.join(script_path, "lib", "converter"),
+    os.path.join(script_path, "lib", "log"),
 ]
 
 for p in library_paths:
@@ -21,8 +24,11 @@ for p in library_paths:
 from tracking_decorator import TrackingDecorator
 from point_generator import PointGenerator
 from peartree_graph_loader import PeartreeGraphLoader
-from osmnx_graph_loader import OsmnxGraphLoader
+from overpass_station_loader import OverpassStationLoader
+from overpass_line_loader import OverpassLineLoader
 from overpass_route_loader import OverpassRouteLoader
+from osm_to_geojson_converter import OsmToGeojsonConverter
+from osmnx_graph_loader import OsmnxGraphLoader
 from graph_transformer import GraphTransformer
 from logger_facade import LoggerFacade
 from isochrone_builder import IsochroneBuilder
@@ -96,9 +102,9 @@ def main(argv):
          "transport_association": "vrr"},
     ]
     cities = [
-        {"name": "hamburg", "query": "Hamburg, Germany", "area": 755, "inhabitants": 1_851_000,
-         "bounding_box": [9.73031519588174, 53.39507758854026, 10.325959157503767, 53.73808674380358],
-         "transport_association": "hvv"}
+        {"name": "berlin", "query": "Berlin, Germany", "area": 891, "inhabitants": 3_600_000,
+         "bounding_box": [13.088333218007715, 52.33824183586156, 13.759587218876971, 52.67491714954712],
+         "transport_association": "vbb"},
     ]
     start_end_times = [(7 * 60 * 60, 8 * 60 * 60)]
     travel_times = [15]
@@ -125,8 +131,6 @@ def main(argv):
             points_per_sqkm = int(arg)
 
     # Set paths
-    file_path = os.path.realpath(__file__)
-    script_path = os.path.dirname(file_path)
     data_path = os.path.join(script_path, "data", "data")
     base_results_path = os.path.join(script_path, "results", "results")
 
@@ -156,14 +160,45 @@ def main(argv):
             quiet=quiet
         )
 
-        for means_of_transportation in ["bus", "subway", "light_train", "tram"]:
-            # Load routes
-            OverpassRouteLoader().run(
+        for means_of_transportation in ["bus", "subway", "light_rail", "tram"]:
+            # Load stations
+            OverpassStationLoader().run(
                 logger=logger,
-                results_path=os.path.join(results_path, "geojson"),
+                results_path=os.path.join(results_path, "osm"),
                 city=city_name,
                 bounding_box=bounding_box,
                 transport=means_of_transportation,
+                clean=clean,
+                quiet=quiet
+            )
+
+            # Load lines
+            OverpassLineLoader().run(
+                logger=logger,
+                results_path=os.path.join(results_path, "osm"),
+                city=city_name,
+                bounding_box=bounding_box,
+                transport=means_of_transportation,
+                clean=clean,
+                quiet=quiet
+            )
+
+            # Load routes
+            OverpassRouteLoader().run(
+                logger=logger,
+                results_path=os.path.join(results_path, "osm"),
+                city=city_name,
+                bounding_box=bounding_box,
+                transport=means_of_transportation,
+                clean=clean,
+                quiet=quiet
+            )
+
+            OsmToGeojsonConverter().run(
+                logger=logger,
+                data_path=os.path.join(results_path, "osm"),
+                results_path=os.path.join(results_path, "geojson"),
+                means_of_transportation=means_of_transportation,
                 clean=clean,
                 quiet=quiet
             )
