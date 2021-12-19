@@ -17,6 +17,16 @@ app.add_middleware(
 )
 
 
+### LOAD GRAPHS ###
+#
+#
+#
+#
+
+
+
+
+
 class CityBasicInformation:
     def __init__(self):
         self.city_name = ""
@@ -100,7 +110,55 @@ def get_isochrones(city, transport):
 
 @app.get("/place")
 def get_metrics(lat, lon):
-    # TODO Implement
+    '''
+    find or emit some information for same place with coordinates are given to the route/endpoint.
+    functions ->
+        It is nessecary to define an methode to find nearby stations.
+        It is nessecary to define an methode to find nearby lines.
+        It is nessecary to define an methode to calculate an index.
+        It is nessecary to define an methode to calculate a travel distance.
+
+
+    Parameters
+        lat: float
+        lon: float
+    Return
+        returns an PlaceMetricsObject witch includes Stationinformation, Lineinformation, IndexScore and TravelDistanceInformation
+    '''
+    # TODO Implement methode to find nearby stations
+    def find_nearby_stations():
+        '''
+        It is nessecary to define an methode to find nearby stations.
+        Load an geojson with stations and find some stuff.
+        
+        Return
+        ------
+        List: 
+            of Stationinformation Classobjects
+        '''
+        pass
+
+    # TODO Implement methode to find nearby lines
+    def find_nearby_lines():
+        '''
+        It is nessecary to define an methode to find nearby lines.
+        Load an geojson with stations and find some stuff.
+
+        Return
+        ------
+        List:
+            of Lineinformation Classobjects
+        '''
+        pass
+
+    # TODO Implement methode to calculate an index
+    def calculate_index():
+        pass
+
+    # TODO Implement methode to calculate a travel distance
+    def calculate_travel_distance():
+        pass
+
     return PlaceMetrics()
 
 
