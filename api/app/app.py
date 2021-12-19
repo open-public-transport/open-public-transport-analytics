@@ -159,7 +159,6 @@ def get_metrics(lat, lon):
         It is nessecary to define an methode to calculate an index.
         It is nessecary to define an methode to calculate a travel distance.
 
-
     Parameters
     ----------
         lat: float
@@ -173,6 +172,7 @@ def get_metrics(lat, lon):
         '''
         It is nessecary to define an methode to find nearby stations.
         Load an geojson with stations and find some stuff.
+        
         Parameters
         ----------
         lat: float
@@ -189,6 +189,7 @@ def get_metrics(lat, lon):
         # create your circle buffer from one of the points
         # 
         # distance = 0.00001
+        # TODO check distance scale 1 isn't 1 KM .... 1 find all Stations in Berlin
         distance = 0.0001
         #distance = 0.001
         #distance = 0.01
@@ -212,7 +213,8 @@ def get_metrics(lat, lon):
                 pass
         print(count) 
         '''
-        # TODO implement return Objectstructure like GEOM + id + description ... id is nessecary to take and reference the lines
+        # TODO implement return Objectstructure like GEOM + id + description 
+        # ... id is nessecary to reference the lines/routes
         #print(point_1)
         pass
 
