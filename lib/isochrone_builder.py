@@ -193,13 +193,13 @@ class IsochroneBuilder:
                 failed_points.append(point_with_spatial_distance)
 
         write_points_to_geojson(
-            file_path=os.path.join(results_path, "isochrones-" + str(travel_time)),
+            file_path=os.path.join(results_path, "isochrones-" + str(travel_time) + ".geojson"),
             coords=points_with_spatial_distance,
             travel_time=travel_time
         )
 
         write_points_to_geojson(
-            file_path=os.path.join(results_path, "isochrones-" + str(travel_time)) + "-failed",
+            file_path=os.path.join(results_path, "isochrones-" + str(travel_time)) + "-failed.geojson",
             coords=failed_points,
             travel_time=travel_time
         )
