@@ -5,6 +5,7 @@ import sys
 # Make library available in path
 library_paths = [
     os.path.join(os.getcwd(), "lib"),
+    os.path.join(os.getcwd(), "lib", "cloud"),
     os.path.join(os.getcwd(), "lib", "loader", "osmnx"),
     os.path.join(os.getcwd(), "lib", "loader", "overpass"),
     os.path.join(os.getcwd(), "lib", "loader", "peartree"),
@@ -25,6 +26,7 @@ from overpass_route_loader import OverpassRouteLoader
 from graph_transformer import GraphTransformer
 from logger_facade import LoggerFacade
 from isochrone_builder import IsochroneBuilder
+from google_cloud_platform_bucket_uploader import GoogleCloudPlatformBucketUploader
 
 
 #
@@ -219,6 +221,16 @@ def main(argv):
                     clean=clean,
                     quiet=quiet
                 )
+
+            # Upload results
+            GoogleCloudPlatformBucketUploader().upload_data(
+                logger=logger,
+                data_path=results_path,
+                city=city_name,
+                project_id="open-public-transport",
+                bucket_name="open-public-transport-results",
+                quiet=quiet
+            )
 
 
 if __name__ == "__main__":
