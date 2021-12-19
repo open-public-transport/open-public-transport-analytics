@@ -74,6 +74,7 @@ pip install geopy
 pip install peartree
 pip install fastapi
 pip install osm2geojson
+pip install google-cloud-storage
 ```
 
 ## Usage (analysis)
