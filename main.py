@@ -70,7 +70,7 @@ def main(argv):
          "transport_association": "vbb"},
         {"name": "hamburg", "query": "Hamburg, Germany", "area": 755, "inhabitants": 1_851_000,
          "bounding_box": [9.73031519588174, 53.39507758854026, 10.325959157503767, 53.73808674380358],
-         "transport_association": "hhv"},
+         "transport_association": "hvv"},
         {"name": "hamm", "query": "Hamm, Germany", "area": 226, "inhabitants": 178_000,
          "bounding_box": [7.675536280292723, 51.57805231922079, 7.997528913639968, 51.744766475157476],
          "transport_association": "vrr"},
@@ -94,12 +94,9 @@ def main(argv):
          "transport_association": "vrr"},
     ]
     cities = [
-        {"name": "berlin", "query": "Berlin, Germany", "area": 891, "inhabitants": 3_600_000,
-         "bounding_box": [13.088333218007715, 52.33824183586156, 13.759587218876971, 52.67491714954712],
-         "transport_association": "vbb"},
         {"name": "hamburg", "query": "Hamburg, Germany", "area": 755, "inhabitants": 1_851_000,
          "bounding_box": [9.73031519588174, 53.39507758854026, 10.325959157503767, 53.73808674380358],
-         "transport_association": "hhv"}
+         "transport_association": "hvv"}
     ]
     start_end_times = [(7 * 60 * 60, 8 * 60 * 60)]
     travel_times = [15]
