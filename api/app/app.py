@@ -97,6 +97,7 @@ class StationInformation:
         self.relative_stations_per_inhabitant = RankedValue(),
 
 
+
 class LineInformation:
     def __init__(self):
         self.transport_type = ""  # all, bus, light_rail, subway, tram
