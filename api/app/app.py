@@ -167,16 +167,40 @@ def get_metrics(lat, lon):
     ------
         returns an PlaceMetricsObject witch includes Stationinformation (as List), Lineinformation (as List), IndexScore and TravelDistanceInformation
     '''
+
+    def find_nearby_entity(point, geometry, distance = 0.02):
+        '''
+        Global Method to find entities ind some GEO Stuff
+        
+        Parameters
+        ----------
+        lat: float
+        lon: float
+        geometry: geometry Object like a LineSting or a Point
+        distance: float #round about 2KM
+
+        Return
+        ------
+        Boolean: 
+            True/False
+        '''
+        circle_buffer = point.buffer(distance)
+
+        #All Version has different compute costs and the last Method (VERSION 3) has different numbers of lines
+
+        #return geometry.within(circle_buffer) #VERSION 1 -> lines 3813 -> Wall time: 1.09 s
+        #return circle_buffer.contains(geometry) #VERSION 2 -> lines 3813 -> Wall time: 1.13 s
+        return point.distance(geometry) < distance #VERSION 3 -> 
+
     # TODO Implement methode to find nearby stations
-    def find_nearby_stations(lat,lon,data):
+    def find_nearby_stations(point, data):
         '''
         It is nessecary to define an methode to find nearby stations.
         Load an geojson with stations and find some stuff.
         
         Parameters
         ----------
-        lat: float
-        lon: float
+        point: shapely PointObject
         data: GeoDataFrame - GeoJSON
 
         Return
@@ -184,47 +208,24 @@ def get_metrics(lat, lon):
         List: 
             of Stationinformation Classobjects
         '''
-        point = Point(lat, lon)
-
-        # create circle buffer from the points
-        # 
-        # distance = 0.00001
-        # TODO check distance scale 1 isn't 1 KM .... 1 find all Stations in Berlin
-        distance = 0.0001
-        #distance = 0.001
-        #distance = 0.01
-        circle_buffer = point.buffer(distance)
-        count = 0
-        #### VERSION ONE WITHIN #### 
+        stations = []
+        #point = Point(lat, lon)
         for geom in data.geometry:
-            #print(geom)
-            if geom.within(circle_buffer):
-                count = count + 1
-        print(count)
-
-        '''
-        #### VERSION TWO BUFFER RADIUS CONTAINS ####
-        for geom in df_stations.geometry:
-            if circle_buffer.contains(geom):
-                count = count + 1
-        print(count) 
-        '''
-
-        '''
-        #### VERSION THREE WITH DISTANCE ####
-        for geom in df_stations.geometry:
-            if point.distance(geom) < distance:
-                count = count + 1
-        print(count)
-        '''
-
+            if find_nearby_entity(lat, lon, geom):
+                # TODO build an Object to store all the Information, COunt or Whatever
+                stations.append('row with Data') 
+                pass
+        
+        # TODO use ListComprehensions or Lambda Statements to reduce the compute cost
+        #stations_object = [row for row in data if find_nearby_entity(lat, lon, geom)]
+        
         # TODO implement return Objectstructure like GEOM + id + description 
         # ... id is nessecary to reference the lines/routes
-        #print(point_1)
-        pass
+        
+        return
 
     # TODO Implement methode to find nearby lines
-    def find_nearby_lines(lat, lon, data):
+    def find_nearby_lines(point, data):
         '''
         It is nessecary to define an methode to find nearby lines.
         Load an geojson with stations and find some stuff.
@@ -236,45 +237,19 @@ def get_metrics(lat, lon):
         List:
             of Lineinformation Classobjects
         '''
-        point = Point(lat, lon)
-
-        # create circle buffer from the points
-        # 
-        # distance = 0.00001
-        # TODO check distance scale 1 isn't 1 KM .... 1 find all Stations in Berlin
-        distance = 0.0001
-        #distance = 0.001
-        #distance = 0.01
-        circle_buffer = point.buffer(distance)
-        count = 0
-
-
+        lines = []
         #### VERSION ONE WITHIN #### 
         for geom in data.geometry:
-            #print(geom)
-            if geom.within(circle_buffer):
-                count = count + 1
-        print(count)
+            if find_nearby_entity(lat, lon, geom):
+                # TODO build an Object to store all the Information, COunt or Whatever
+                lines.append('row with Data') 
+                pass
         
-        '''
-        #### VERSION TWO BUFFER RADIUS CONTAINS ####
-        count = 0
-        for geom in df_lines.geometry:
-            if circle_buffer.contains(geom):
-                count = count + 1
-        print(count)
-        '''
+        # TODO use ListComprehensions or Lambda Statements to reduce the compute cost
+        # lines_object = [row for row in data if find_nearby_entity(lat, lon, geom)]
 
-        '''
-        #### VERSION THREE WITH DISTANCE ####
-        count = 0
-        for geom in df_lines.geometry:
-            if point.distance(geom) < distance:
-                count = count + 1
-        print(count)
-        '''
-
-        pass
+        # TODO implement return Objectstructure like GEOM + id + description 
+        return
 
     # TODO Implement methode to calculate an index
     def calculate_index():
