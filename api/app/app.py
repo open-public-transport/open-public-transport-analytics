@@ -200,8 +200,6 @@ def get_metrics(lat, lon):
             #print(geom)
             if geom.within(circle_buffer):
                 count = count + 1
-                #print(str(geom)+'<- is within the distance buffer of point')
-                pass
         print(count)
 
         '''
@@ -209,8 +207,6 @@ def get_metrics(lat, lon):
         for geom in df_stations.geometry:
             if circle_buffer.contains(geom):
                 count = count + 1
-                #print('circle buffer contains point -> '+str(geom))
-                pass
         print(count) 
         '''
 
@@ -219,8 +215,6 @@ def get_metrics(lat, lon):
         for geom in df_stations.geometry:
             if point.distance(geom) < distance:
                 count = count + 1
-                #print('point is within the distance of point -> '+str(geom))
-                pass
         print(count)
         '''
 
@@ -230,7 +224,7 @@ def get_metrics(lat, lon):
         pass
 
     # TODO Implement methode to find nearby lines
-    def find_nearby_lines():
+    def find_nearby_lines(lat, lon, data):
         '''
         It is nessecary to define an methode to find nearby lines.
         Load an geojson with stations and find some stuff.
@@ -242,6 +236,44 @@ def get_metrics(lat, lon):
         List:
             of Lineinformation Classobjects
         '''
+        point = Point(lat, lon)
+
+        # create circle buffer from the points
+        # 
+        # distance = 0.00001
+        # TODO check distance scale 1 isn't 1 KM .... 1 find all Stations in Berlin
+        distance = 0.0001
+        #distance = 0.001
+        #distance = 0.01
+        circle_buffer = point.buffer(distance)
+        count = 0
+
+
+        #### VERSION ONE WITHIN #### 
+        for geom in data.geometry:
+            #print(geom)
+            if geom.within(circle_buffer):
+                count = count + 1
+        print(count)
+        
+        '''
+        #### VERSION TWO BUFFER RADIUS CONTAINS ####
+        count = 0
+        for geom in df_lines.geometry:
+            if circle_buffer.contains(geom):
+                count = count + 1
+        print(count)
+        '''
+
+        '''
+        #### VERSION THREE WITH DISTANCE ####
+        count = 0
+        for geom in df_lines.geometry:
+            if point.distance(geom) < distance:
+                count = count + 1
+        print(count)
+        '''
+
         pass
 
     # TODO Implement methode to calculate an index
