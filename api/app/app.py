@@ -3,7 +3,7 @@ import random
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
-from shapely.geometry import Point #, Polygon
+from shapely.geometry import Point, LineString #, MultiPoint, MultiLineString #, Polygon
 
 app = FastAPI()
 app.add_middleware(
@@ -186,7 +186,7 @@ def get_metrics(lat, lon):
         '''
         point = Point(lat, lon)
 
-        # create your circle buffer from one of the points
+        # create circle buffer from the points
         # 
         # distance = 0.00001
         # TODO check distance scale 1 isn't 1 KM .... 1 find all Stations in Berlin
@@ -200,7 +200,7 @@ def get_metrics(lat, lon):
             #print(geom)
             if geom.within(circle_buffer):
                 count = count + 1
-                #print('point 2 is within the distance buffer of point 1')
+                #print(str(geom)+'<- is within the distance buffer of point')
                 pass
         print(count)
 
@@ -209,10 +209,21 @@ def get_metrics(lat, lon):
         for geom in df_stations.geometry:
             if circle_buffer.contains(geom):
                 count = count + 1
-                #print('circle buffer contains point 2')
+                #print('circle buffer contains point -> '+str(geom))
                 pass
         print(count) 
         '''
+
+        '''
+        #### VERSION THREE WITH DISTANCE ####
+        for geom in df_stations.geometry:
+            if point.distance(geom) < distance:
+                count = count + 1
+                #print('point is within the distance of point -> '+str(geom))
+                pass
+        print(count)
+        '''
+
         # TODO implement return Objectstructure like GEOM + id + description 
         # ... id is nessecary to reference the lines/routes
         #print(point_1)
@@ -223,6 +234,8 @@ def get_metrics(lat, lon):
         '''
         It is nessecary to define an methode to find nearby lines.
         Load an geojson with stations and find some stuff.
+
+        2 Ways ... with RouteID or with Coords from Point with Buffer or Distance
 
         Return
         ------
