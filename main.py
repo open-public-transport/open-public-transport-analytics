@@ -263,7 +263,7 @@ def main(argv):
                 data_path=results_path,
                 city=city_name,
                 project_id="open-public-transport",
-                bucket_name="open-public-transport-results",
+                bucket_name="open-public-transport.appspot.com",
                 quiet=quiet
             )
 
