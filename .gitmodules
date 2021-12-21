@@ -1,6 +1,3 @@
-[submodule "results"]
-	path = results
-	url = git@github.com:open-public-transport/open-public-transport-results.git
 [submodule "data"]
 	path = data
 	url = git@github.com:open-public-transport/open-public-transport-data.git
