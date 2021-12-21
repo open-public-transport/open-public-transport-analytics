@@ -252,6 +252,8 @@ def main(argv):
                     city=city_name,
                     graph=graph,
                     sample_points=sample_points,
+                    start_time=start_time,
+                    end_time=end_time,
                     travel_time=travel_time,
                     clean=clean,
                     quiet=quiet

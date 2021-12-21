@@ -195,7 +195,7 @@ def write_polygon_to_geojson(file_path, graph):
 class IsochroneBuilder:
 
     @TrackingDecorator.track_time
-    def run(self, logger, data_path, results_path, city, graph, sample_points, travel_time, clean=False, quiet=False):
+    def run(self, logger, data_path, results_path, city, graph, sample_points, travel_time, start_time, end_time):
         points_with_spatial_distance = []
         failed_points = []
 
@@ -243,13 +243,13 @@ class IsochroneBuilder:
                 failed_points.append(point_with_spatial_distance)
 
         write_points_to_geojson(
-            file_path=os.path.join(results_path, "isochrones-" + str(travel_time) + ".geojson"),
+            file_path=os.path.join(results_path, f"isochrones-{str(travel_time)}min-{start_time}-{end_time}.geojson"),
             coords=points_with_spatial_distance,
             travel_time=travel_time
         )
 
         write_points_to_geojson(
-            file_path=os.path.join(results_path, "isochrones-" + str(travel_time)) + "-failed.geojson",
+            file_path=os.path.join(results_path, f"isochrones-{str(travel_time)}min-{start_time}-{end_time}-failed.geojson"),
             coords=failed_points,
             travel_time=travel_time
         )
@@ -257,7 +257,7 @@ class IsochroneBuilder:
         return points_with_spatial_distance, failed_points
 
     @TrackingDecorator.track_time
-    def run_for_place(self, logger, data_path, results_path, city, graph, travel_time, place, clean=False, quiet=False):
+    def run_for_place(self, logger, data_path, results_path, city, graph, travel_time, place):
         points_with_spatial_distance = []
         failed_points = []
         start_point = (place[1], place[0])

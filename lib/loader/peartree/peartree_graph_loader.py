@@ -1,7 +1,6 @@
 import os
 
 import osmnx as ox
-import networkx as nx
 import peartree as pt
 from tracking_decorator import TrackingDecorator
 
