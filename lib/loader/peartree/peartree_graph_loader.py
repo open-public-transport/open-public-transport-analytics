@@ -9,7 +9,6 @@ from tracking_decorator import TrackingDecorator
 def download_transport_graph(logger, data_path, results_path, transport_association, start_time, end_time,
                              existing_graph):
     file_path = os.path.join(results_path, f"transport-{start_time}-{end_time}-osmnx.graphml")
-    file_path_nx = os.path.join(results_path, f"transport-{start_time}-{end_time}-nx.graphml")
 
     try:
         gtfs_path = os.path.join(data_path, "transport-associations", transport_association, "GTFS.zip")
@@ -18,7 +17,12 @@ def download_transport_graph(logger, data_path, results_path, transport_associat
 
         # Save graph
         ox.save_graphml(graph_transport, file_path)
-        # nx.write_graphml(graph_transport, file_path_nx)
+        # nx.write_graphml(graph_transport, os.path.join(results_path, f"transport-{start_time}-{end_time}-nx.graphml"))
+        # nx.write_gpickle(graph_transport, os.path.join(results_path, f"transport-{start_time}-{end_time}-nx.gpickle"))
+        # nx.write_gml(graph_transport, os.path.join(results_path, f"transport-{start_time}-{end_time}-nx.gml"))
+        # nx.write_gexf(graph_transport, os.path.join(results_path, f"transport-{start_time}-{end_time}-nx.gexf"))
+        # nx.write_pajek(graph_transport, os.path.join(results_path, f"transport-{start_time}-{end_time}-nx.net"))
+        # nx.write_yaml(graph_transport, os.path.join(results_path, f"transport-{start_time}-{end_time}-nx.yaml"))
 
         return graph_transport
     except Exception as e:
