@@ -77,6 +77,15 @@ pip install osm2geojson
 pip install google-cloud-storage
 ```
 
+## Usage (prepare)
+
+Run this command to download data.
+
+```shell script
+cd data
+python main.py
+```
+
 ## Usage (analysis)
 
 Run this command to start the main script.
