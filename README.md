@@ -106,12 +106,20 @@ Examples:
 
 Run this command to run the web server locally.
 
-```shell script
+```shell
 cd ./api/app
 uvicorn app:app --reload
 ```
 
 Open http://localhost:8000/docs#/ to see the OpenAPI specification.
+
+### Usage (docker deployment)
+
+Run this command to deploy the Docker image to Google CLoud.
+
+```shell
+gcloud builds submit --tag gcr.io/open-public-transport/open-public-transport-backend
+```
 
 ## Fix graphml files
 
