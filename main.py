@@ -243,7 +243,9 @@ def main(argv):
                 transport_association=transport_association,
                 start_time=start_time,
                 end_time=end_time,
-                existing_graph=graph_walk
+                existing_graph=graph_walk,
+                clean=clean,
+                quiet=quiet
             )
 
             # Iterate over travel times
@@ -256,11 +258,9 @@ def main(argv):
                     city=city_name,
                     graph=graph,
                     sample_points=sample_points,
-                    start_time=start_time,
-                    end_time=end_time,
                     travel_time=travel_time,
-                    clean=clean,
-                    quiet=quiet
+                    start_time=start_time,
+                    end_time=end_time
                 )
 
             # Upload results
