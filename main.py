@@ -64,6 +64,9 @@ def main(argv):
         {"name": "dortmund", "query": "Dortmund, Germany", "area": 280, "inhabitants": 597_000,
          "bounding_box": [7.303593755474529, 51.416072806289165, 7.637115868651861, 51.59952017917111],
          "transport_association": "vrr"},
+        {"name": "dresden", "query": "Dresden, Germany", "area": 328, "inhabitants": 556_000,
+         "bounding_box": [13.579721093821485, 50.9752258280855, 13.965849226642415, 51.176915429975296],
+         "transport_association": "vms"},
         {"name": "duesseldorf", "query": "Düsseldorf, Germany", "area": 217, "inhabitants": 620_000,
          "bounding_box": [6.68881312000002, 51.124375875000055, 6.939933901000074, 51.352486457000055],
          "transport_association": "vrr"},
@@ -85,6 +88,9 @@ def main(argv):
         {"name": "koeln", "query": "Köln, Germany", "area": 405, "inhabitants": 1_083_000,
          "bounding_box": [6.772530403000076, 50.83044939600006, 7.162027995000074, 51.08497434000003],
          "transport_association": "vrs"},
+        {"name": "leipzig", "query": "Leipzig, Germany", "area": 297, "inhabitants": 597_000,
+         "bounding_box": [12.236881307029405, 51.238535279757826, 12.542606999586994, 51.448066882712645],
+         "transport_association": "vms"},
         {"name": "muenchen", "query": "München, Germany", "area": 310, "inhabitants": 1_488_000,
          "bounding_box": [11.36087720838895, 48.06223277978042, 11.723082533270206, 48.24814577602209],
          "transport_association": "mvv"},
@@ -102,9 +108,9 @@ def main(argv):
          "transport_association": "vrr"},
     ]
     cities = [
-        {"name": "berlin", "query": "Berlin, Germany", "area": 891, "inhabitants": 3_600_000,
-         "bounding_box": [13.088333218007715, 52.33824183586156, 13.759587218876971, 52.67491714954712],
-         "transport_association": "vbb"},
+        {"name": "koeln", "query": "Köln, Germany", "area": 405, "inhabitants": 1_083_000,
+         "bounding_box": [6.772530403000076, 50.83044939600006, 7.162027995000074, 51.08497434000003],
+         "transport_association": "vrs"},
     ]
     start_end_times = [(7 * 60 * 60, 8 * 60 * 60)]
     travel_times = [15]
@@ -237,9 +243,7 @@ def main(argv):
                 transport_association=transport_association,
                 start_time=start_time,
                 end_time=end_time,
-                existing_graph=graph_walk,
-                clean=clean,
-                quiet=quiet
+                existing_graph=graph_walk
             )
 
             # Iterate over travel times
