@@ -37,14 +37,18 @@ def main(argv):
     quiet = False
     points_per_sqkm = 100
     cities = [
-        {"name": "berlin", "query": "Berlin, Germany", "area": 891, "inhabitants": 3_600_000,
-         "bounding_box": [13.088333218007715, 52.33824183586156, 13.759587218876971, 52.67491714954712],
-         "transport_association": "vbb"}
+        # {"name": "berlin", "query": "Berlin, Germany", "area": 891, "inhabitants": 3_600_000,
+        #  "bounding_box": [13.088333218007715, 52.33824183586156, 13.759587218876971, 52.67491714954712],
+        #  "transport_association": "vbb"},
+        {"name": "koeln", "query": "Köln, Germany", "area": 405, "inhabitants": 1_083_000,
+         "bounding_box": [6.772530403000076, 50.83044939600006, 7.162027995000074, 51.08497434000003],
+         "transport_association": "vrs"},
     ]
     places = [
-        {"name": "gesundbrunnen", "coords": (13.389444444444, 52.548611111111)},
-        {"name": "ahrensfelde", "coords": (13.565, 52.571667)},
-        {"name": "hauptbahnhof", "coords": (13.369444, 52.525)}
+        # {"name": "gesundbrunnen", "coords": (13.389444444444, 52.548611111111)},
+        # {"name": "ahrensfelde", "coords": (13.565, 52.571667)},
+        # {"name": "hauptbahnhof", "coords": (13.369444, 52.525)},
+        {"name": "köln hauptbahnhof", "coords": (6.958056, 50.9425)}
     ]
     start_end_times = [(7 * 60 * 60, 8 * 60 * 60)]
     travel_times = [15]
@@ -103,9 +107,7 @@ def main(argv):
                         city=city_name,
                         graph=graph,
                         travel_time=travel_time,
-                        place=coords,
-                        clean=clean,
-                        quiet=quiet
+                        place=coords
                     )
 
 
