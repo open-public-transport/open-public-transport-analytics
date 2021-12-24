@@ -21,10 +21,10 @@ class CityBasicInformation:
     def __init__(self):
         self.city_name = ""
         self.federal_state_name = ""
-        self.group = "",
-        self.inhabitants = -1,
-        self.area = -1,
-        self.population_density = -1,
+        self.group = ""
+        self.inhabitants = -1
+        self.area = -1
+        self.population_density = -1
 
 
 class RankedValue:
@@ -37,37 +37,37 @@ class RankedValue:
 
 
 class StationInformation:
-    def __init__(self):
-        self.transport_type = ""  # all, bus, light_rail, subway, tram
-        self.absolute_stations_count = RankedValue(),
-        self.absolute_stations_accessibility_count = RankedValue(),
-        self.relative_stations_accessibility_percentage = RankedValue(),
-        self.relative_stations_per_sqkm = RankedValue(),
-        self.relative_stations_per_inhabitant = RankedValue(),
+    def __init__(self, transport_type = ""):
+        self.transport_type = transport_type  # all, bus, light_rail, subway, tram
+        self.absolute_stations_count = RankedValue()
+        self.absolute_stations_accessibility_count = RankedValue()
+        self.relative_stations_accessibility_percentage = RankedValue()
+        self.relative_stations_per_sqkm = RankedValue()
+        self.relative_stations_per_inhabitant = RankedValue()
 
 
 class LineInformation:
-    def __init__(self):
-        self.transport_type = ""  # all, bus, light_rail, subway, tram
-        self.absolute_line_count = RankedValue(),
-        self.absolute_line_accessibility_count = RankedValue(),
-        self.relative_line_accessibility_percentage = RankedValue(),
-        self.relative_line_per_sqkm = RankedValue(),
-        self.relative_line_per_inhabitant = RankedValue(),
+    def __init__(self, transport_type = ""):
+        self.transport_type = transport_type # all, bus, light_rail, subway, tram
+        self.absolute_line_count = RankedValue()
+        self.absolute_line_accessibility_count = RankedValue()
+        self.relative_line_accessibility_percentage = RankedValue()
+        self.relative_line_per_sqkm = RankedValue()
+        self.relative_line_per_inhabitant = RankedValue()
 
 
 class TravelDistanceInformation:
     def __init__(self):
         self.transport_type = ""  # all, bus, light_rail, subway, tram
-        self.absolute_avg_isochrone_area = RankedValue(),
-        self.absolute_avg_isochrone_area_rank = RankedValue(),
+        self.absolute_avg_isochrone_area = RankedValue()
+        self.absolute_avg_isochrone_area_rank = RankedValue()
 
 
 class PlaceMetrics:
-    def __init__(self):
+    def __init__(self, station_information = [], line_information  = []):
         self.mobility_index = random.randint(0, 100)
-        self.station_information = [StationInformation()]
-        self.line_information = [LineInformation()]
+        self.station_information = station_information
+        self.line_information = line_information
         self.travel_distance_information = [TravelDistanceInformation()]
 
 
@@ -100,8 +100,20 @@ def get_isochrones(city, transport):
 
 @app.get("/place")
 def get_metrics(lat, lon):
-    # TODO Implement
-    return PlaceMetrics()
+    return PlaceMetrics(
+        station_information= [
+            StationInformation(transport_type="bus"),
+            StationInformation(transport_type="light_rail"),
+            StationInformation(transport_type="subway"),
+            StationInformation(transport_type="tram")
+        ],
+        line_information=[
+            LineInformation(transport_type="bus"),
+            LineInformation(transport_type="light_rail"),
+            LineInformation(transport_type="subway"),
+            LineInformation(transport_type="tram")
+        ]
+    )
 
 
 @app.get("/isochrone")
