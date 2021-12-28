@@ -29,8 +29,8 @@ for p in library_paths:
 from cities import Cities
 
 # Set paths
-data_path = os.path.join(script_path, "data", "data")
-base_results_path = os.path.join(script_path, "results", "results")
+data_path = os.path.join(script_path, "..", "data", "data")
+base_results_path = os.path.join(script_path, "..", "results", "results")
 
 app = FastAPI()
 app.add_middleware(
