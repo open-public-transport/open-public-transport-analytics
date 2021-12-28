@@ -9,7 +9,7 @@ class PlaceMetrics:
             station_information = []
         if line_information is None:
             line_information = []
-        self.mobility_index = random.randint(0, 100)
+        self.mobility_index = None
         self.station_information = station_information
         self.line_information = line_information
         self.bike_information = bike_information
