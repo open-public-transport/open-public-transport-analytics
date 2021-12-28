@@ -1,8 +1,36 @@
+import os
 import random
+import sys
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+file_path = os.path.realpath(__file__)
+script_path = os.path.dirname(file_path)
+
+# Make library available in path
+library_paths = [
+    os.path.join(script_path, "..", "lib"),
+    os.path.join(script_path, "..", "lib", "config"),
+    os.path.join(script_path, "..", "lib", "cloud"),
+    os.path.join(script_path, "..", "lib", "loader", "osmnx"),
+    os.path.join(script_path, "..", "lib", "loader", "overpass"),
+    os.path.join(script_path, "..", "lib", "loader", "peartree"),
+    os.path.join(script_path, "..", "lib", "converter"),
+    os.path.join(script_path, "..", "lib", "log"),
+]
+
+for p in library_paths:
+    if not (p in sys.path):
+        sys.path.insert(0, p)
+
+# Import library classes
+from cities import Cities
+
+# Set paths
+data_path = os.path.join(script_path, "data", "data")
+base_results_path = os.path.join(script_path, "results", "results")
 
 app = FastAPI()
 app.add_middleware(
