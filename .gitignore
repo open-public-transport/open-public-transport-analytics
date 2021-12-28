@@ -14,7 +14,7 @@
 /lib/loader/osmnx/__pycache__
 /lib/loader/overpass/__pycache__
 /lib/loader/peartree/__pycache__
-/api/app/__pycache__
+/app/__pycache__
 
 /GDAL*/*
 GDAL*.tar.gz
