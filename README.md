@@ -107,11 +107,20 @@ Examples:
 Run this command to run the web server locally.
 
 ```shell
-cd ./api/app
+cd ./app
 uvicorn app:app --reload
 ```
 
 Open http://localhost:8000/docs#/ to see the OpenAPI specification.
+
+### Usage (local docker)
+
+Run this command to run the docker container locally.
+
+```shell
+docker build -t open-public-transport .
+docker run -p 8080:8000 open-public-transport
+```
 
 ### Usage (docker deployment)
 
