@@ -1,5 +1,6 @@
 class CityBasicInformation:
     def __init__(self):
+        self.id = ""
         self.city_name = ""
         self.federal_state_name = ""
         self.group = ""
