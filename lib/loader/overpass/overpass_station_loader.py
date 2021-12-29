@@ -103,6 +103,9 @@ class OverpassStationLoader:
 
                 return json_content
             else:
+                if not quiet:
+                    logger.log_line(f"✗️ Failed to download {city} station {public_transport_type}")
+
                 return None
         else:
             # Load graph
