@@ -18,6 +18,7 @@ library_paths = [
     os.path.join(script_path, "..", "lib", "loader", "overpass"),
     os.path.join(script_path, "..", "lib", "loader", "peartree"),
     os.path.join(script_path, "..", "lib", "converter"),
+    os.path.join(script_path, "..", "lib", "metrics"),
     os.path.join(script_path, "..", "lib", "log"),
 ]
 
@@ -26,11 +27,8 @@ for p in library_paths:
         sys.path.insert(0, p)
 
 # Import library classes
-from bike_information import BikeInformation
-from city_metrics import CityMetrics
-from place_metrics import PlaceMetrics
-from station_information import StationInformation
-from line_information import LineInformation
+from place_metrics_builder import PlaceMetricsBuilder
+from city_metrics_builder import CityMetricsBuilder
 
 # Set paths
 data_path = os.path.join(script_path, "..", "data", "data")
@@ -70,21 +68,11 @@ def get_isochrones(city, public_transport_type):
 #
 
 @app.get("/place")
-def get_metrics(lat, lon):
-    return PlaceMetrics(
-        station_information=[
-            StationInformation(transport_type="bus"),
-            StationInformation(transport_type="light_rail"),
-            StationInformation(transport_type="subway"),
-            StationInformation(transport_type="tram")
-        ],
-        line_information=[
-            LineInformation(transport_type="bus"),
-            LineInformation(transport_type="light_rail"),
-            LineInformation(transport_type="subway"),
-            LineInformation(transport_type="tram")
-        ],
-        bike_information=BikeInformation()
+def get_place_metrics(city_id="berlin", lat=52.516389, lon=13.377778):
+    return PlaceMetricsBuilder(results_path=os.path.join(base_results_path, city_id.lower())).run(
+        city_id=city_id,
+        lat=lat,
+        lon=lon
     )
 
 
