@@ -37,6 +37,8 @@ def get_isochrone_metrics(logger, data_path, city, start_point, subgraph, walkin
 
         longitudes, latitudes = get_convex_hull(nodes=nodes)
         points = []
+
+        # Filter points that are outside city limits
         for point in zip(longitudes, latitudes):
 
             p = ogr.Geometry(ogr.wkbPoint)
@@ -50,7 +52,7 @@ def get_isochrone_metrics(logger, data_path, city, start_point, subgraph, walkin
 
         convex_hull_polygon = Polygon(points)
 
-        transport_distances_meters = get_distances(start_point=start_point, latitudes=latitudes, longitudes=longitudes)
+        transport_distances_meters = get_distances(start_point=start_point, points=points)
 
         return np.mean(transport_distances_meters) + walking_distance_meters, \
                np.median(transport_distances_meters) + walking_distance_meters, \
@@ -121,8 +123,8 @@ def get_convex_hull(nodes):
     return MultiPoint(nodes.reset_index()["geometry"]).convex_hull.exterior.coords.xy
 
 
-def get_distances(start_point, latitudes, longitudes):
-    return [geopy.distance.geodesic(point, start_point).meters for point in zip(latitudes, longitudes)]
+def get_distances(start_point, points):
+    return [geopy.distance.geodesic(point, start_point).meters for point in points]
 
 
 def write_points_to_geojson(file_path, coords, travel_time):
