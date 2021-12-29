@@ -6,11 +6,11 @@ import requests
 from tracking_decorator import TrackingDecorator
 
 
-def download_line_json(logger, file_path, bounding_box, transport):
+def download_line_json(logger, file_path, bounding_box, public_transport_type):
     bbox = f"({bounding_box[1]}, {bounding_box[0]}, {bounding_box[3]}, {bounding_box[2]})"
 
     try:
-        if transport == "bus":
+        if public_transport_type == "bus":
             data = f"""
 [out:json][timeout:25];
 (
@@ -18,7 +18,7 @@ def download_line_json(logger, file_path, bounding_box, transport):
 );
 out geom;
                 """
-        elif transport == "light_rail":
+        elif public_transport_type == "light_rail":
             data = f"""
 [out:json][timeout:25];
 (
@@ -26,7 +26,7 @@ out geom;
 );
 out geom;
                 """
-        elif transport == "subway":
+        elif public_transport_type == "subway":
             data = f"""
 [out:json][timeout:25];
 (
@@ -34,7 +34,7 @@ out geom;
 );
 out geom;
                 """
-        elif transport == "tram":
+        elif public_transport_type == "tram":
             data = f"""
 [out:json][timeout:25];
 (
@@ -79,12 +79,12 @@ def load_json(file_path):
 class OverpassLineLoader:
 
     @TrackingDecorator.track_time
-    def run(self, logger, results_path, city, bounding_box, transport, clean=False, quiet=False):
+    def run(self, logger, results_path, city, bounding_box, public_transport_type, clean=False, quiet=False):
         # Make results path
         os.makedirs(os.path.join(results_path), exist_ok=True)
 
         # Define file path
-        file_path = os.path.join(results_path, "lines-" + transport + ".json")
+        file_path = os.path.join(results_path, "lines-" + public_transport_type + ".json")
 
         # Check if result needs to be generated
         if clean or not os.path.exists(file_path):
@@ -94,12 +94,12 @@ class OverpassLineLoader:
                 logger=logger,
                 file_path=file_path,
                 bounding_box=bounding_box,
-                transport=transport
+                public_transport_type=public_transport_type
             )
 
             if json_content is not None:
                 if not quiet:
-                    logger.log_line(f"✓ Download {city} line {transport}")
+                    logger.log_line(f"✓ Download {city} line {public_transport_type}")
 
                 return json_content
             else:
@@ -109,6 +109,6 @@ class OverpassLineLoader:
             json_content = load_json(file_path=file_path)
 
             if not quiet:
-                logger.log_line(f"✓ Load {city} line {transport}")
+                logger.log_line(f"✓ Load {city} line {public_transport_type}")
 
             return json_content

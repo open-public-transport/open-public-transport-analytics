@@ -60,7 +60,7 @@ def get_isochrones(city):
 
 
 @app.get("/transport")
-def get_isochrones(city, transport):
+def get_isochrones(city, public_transport_type):
     # TODO Implement
     return {}
 
@@ -89,7 +89,7 @@ def get_metrics(lat, lon):
 
 
 @app.get("/isochrone")
-def get_isochrones(lat, lon, transport):
+def get_isochrones(lat, lon, public_transport_type):
     # TODO Implement
     return {}
 

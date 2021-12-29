@@ -29,7 +29,7 @@ def convert_json_to_geojson(file_path, json_content):
 class OsmToGeojsonConverter:
 
     @TrackingDecorator.track_time
-    def run(self, logger, data_path, results_path, means_of_transportation, clean=False, quiet=False):
+    def run(self, logger, data_path, results_path, public_transport_type, clean=False, quiet=False):
 
         # Make results path
         os.makedirs(os.path.join(results_path), exist_ok=True)
@@ -48,4 +48,4 @@ class OsmToGeojsonConverter:
                 )
 
                 if not quiet:
-                    logger.log_line(f"✓ Convert {means_of_transportation} to GeoJSON")
+                    logger.log_line(f"✓ Convert {public_transport_type} to GeoJSON")

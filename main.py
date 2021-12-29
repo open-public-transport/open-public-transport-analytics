@@ -83,6 +83,7 @@ def main(argv):
         inhabitants = city["inhabitants"]
         bounding_box = city["bounding_box"]
         transport_association = city["transport_association"]
+        public_transport_types = city["public_transport_types"]
 
         results_path = os.path.join(base_results_path, city_name)
 
@@ -100,14 +101,14 @@ def main(argv):
             quiet=quiet
         )
 
-        for means_of_transportation in ["bus", "subway", "light_rail", "tram"]:
+        for public_transport_type in public_transport_types:
             # Load stations
             OverpassStationLoader().run(
                 logger=logger,
                 results_path=os.path.join(results_path, "osm"),
                 city=city_name,
                 bounding_box=bounding_box,
-                transport=means_of_transportation,
+                transport=public_transport_type,
                 clean=clean,
                 quiet=quiet
             )
@@ -118,7 +119,7 @@ def main(argv):
                 results_path=os.path.join(results_path, "osm"),
                 city=city_name,
                 bounding_box=bounding_box,
-                transport=means_of_transportation,
+                public_transport_type=public_transport_type,
                 clean=clean,
                 quiet=quiet
             )
@@ -129,7 +130,7 @@ def main(argv):
                 results_path=os.path.join(results_path, "osm"),
                 city=city_name,
                 bounding_box=bounding_box,
-                transport=means_of_transportation,
+                public_transport_type=public_transport_type,
                 clean=clean,
                 quiet=quiet
             )
@@ -138,7 +139,7 @@ def main(argv):
                 logger=logger,
                 data_path=os.path.join(results_path, "osm"),
                 results_path=os.path.join(results_path, "geojson"),
-                means_of_transportation=means_of_transportation,
+                public_transport_type=public_transport_type,
                 clean=clean,
                 quiet=quiet
             )
