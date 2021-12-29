@@ -27,12 +27,12 @@ def get_isochrone(logger, graph, start_point, travel_time, distance_attribute="t
         return None, 0
 
 
-def get_isochrone_metrics(logger, data_path, city, start_point, subgraph, walking_distance_meters):
+def get_isochrone_metrics(logger, data_path, city_id, start_point, subgraph, walking_distance_meters):
     try:
         nodes, edges = ox.graph_to_gdfs(subgraph)
 
         # Define valid polygons
-        polygon_file = os.path.join(data_path, "cities", city, "boundaries", "boundaries.geojson")
+        polygon_file = os.path.join(data_path, "cities", city_id, "boundaries", "boundaries.geojson")
         valid_polygons = get_polygons(read_geojson(polygon_file))
 
         longitudes, latitudes = get_convex_hull(nodes=nodes)
@@ -48,7 +48,7 @@ def get_isochrone_metrics(logger, data_path, city, start_point, subgraph, walkin
             if is_in_desired_area(p, valid_polygons):
                 points.append([point[0], point[1]])
             else:
-                logger.log_line(f"{city} point outside city {point[0]}, {point[1]}")
+                logger.log_line(f"{city_id} point outside city {point[0]}, {point[1]}")
 
         convex_hull_polygon = Polygon(points)
 
@@ -197,7 +197,7 @@ def write_polygon_to_geojson(file_path, graph):
 class IsochroneBuilder:
 
     @TrackingDecorator.track_time
-    def run(self, logger, data_path, results_path, city, graph, sample_points, travel_time, start_time, end_time):
+    def run(self, logger, data_path, results_path, city_id, graph, sample_points, travel_time, start_time, end_time):
         points_with_spatial_distance = []
         failed_points = []
 
@@ -223,7 +223,7 @@ class IsochroneBuilder:
             mean_spatial_distance, median_spatial_distance, min_spatial_distance, max_spatial_distance, area = get_isochrone_metrics(
                 logger=logger,
                 data_path=data_path,
-                city=city,
+                city_id=city_id,
                 start_point=start_point,
                 subgraph=subgraph,
                 walking_distance_meters=walking_distance_meters
@@ -259,7 +259,7 @@ class IsochroneBuilder:
         return points_with_spatial_distance, failed_points
 
     @TrackingDecorator.track_time
-    def run_for_place(self, logger, data_path, results_path, city, graph, travel_time, place):
+    def run_for_place(self, logger, data_path, results_path, city_id, graph, travel_time, place):
         points_with_spatial_distance = []
         failed_points = []
         start_point = (place[1], place[0])
@@ -279,7 +279,7 @@ class IsochroneBuilder:
         mean_spatial_distance, median_spatial_distance, min_spatial_distance, max_spatial_distance, area = get_isochrone_metrics(
             logger=logger,
             data_path=data_path,
-            city=city,
+            city_id=city_id,
             start_point=start_point,
             subgraph=subgraph,
             walking_distance_meters=walking_distance_meters

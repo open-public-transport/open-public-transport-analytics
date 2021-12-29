@@ -52,7 +52,7 @@ def load_json(file_path):
 class OverpassRouteLoader:
 
     @TrackingDecorator.track_time
-    def run(self, logger, results_path, city, bounding_box, public_transport_type, clean=False, quiet=False):
+    def run(self, logger, results_path, city_id, bounding_box, public_transport_type, clean=False, quiet=False):
         # Make results path
         os.makedirs(os.path.join(results_path), exist_ok=True)
 
@@ -72,12 +72,12 @@ class OverpassRouteLoader:
 
             if json_content is not None:
                 if not quiet:
-                    logger.log_line(f"✓ Download {city} route {public_transport_type}")
+                    logger.log_line(f"✓ Download {city_id} route {public_transport_type}")
 
                 return json_content
             else:
                 if not quiet:
-                    logger.log_line(f"✗️ Failed to download {city} route {public_transport_type}")
+                    logger.log_line(f"✗️ Failed to download {city_id} route {public_transport_type}")
 
                 return None
         else:
@@ -85,6 +85,6 @@ class OverpassRouteLoader:
             json_content = load_json(file_path=file_path)
 
             if not quiet:
-                logger.log_line(f"✓ Load {city} route {public_transport_type}")
+                logger.log_line(f"✓ Load {city_id} route {public_transport_type}")
 
             return json_content

@@ -77,6 +77,7 @@ def main(argv):
     # Iterate over cities
     for city in Cities().cities:
 
+        city_id = city["id"]
         city_name = city["name"]
         query = city["query"]
         area = city["area"]
@@ -85,7 +86,7 @@ def main(argv):
         transport_association = city["transport_association"]
         public_transport_types = city["public_transport_types"]
 
-        results_path = os.path.join(base_results_path, city_name)
+        results_path = os.path.join(base_results_path, city_id)
 
         # Initialize logger
         logger = LoggerFacade(results_path, console=True, file=True)
@@ -95,7 +96,7 @@ def main(argv):
             logger=logger,
             data_path=data_path,
             results_path=os.path.join(results_path, "sample-points"),
-            city=city_name,
+            city_id=city_id,
             num_sample_points=area * points_per_sqkm,
             clean=clean,
             quiet=quiet
@@ -106,7 +107,7 @@ def main(argv):
             OverpassStationLoader().run(
                 logger=logger,
                 results_path=os.path.join(results_path, "osm"),
-                city=city_name,
+                city_id=city_id,
                 bounding_box=bounding_box,
                 transport=public_transport_type,
                 clean=clean,
@@ -117,7 +118,7 @@ def main(argv):
             OverpassLineLoader().run(
                 logger=logger,
                 results_path=os.path.join(results_path, "osm"),
-                city=city_name,
+                city_id=city_id,
                 bounding_box=bounding_box,
                 public_transport_type=public_transport_type,
                 clean=clean,
@@ -128,7 +129,7 @@ def main(argv):
             OverpassRouteLoader().run(
                 logger=logger,
                 results_path=os.path.join(results_path, "osm"),
-                city=city_name,
+                city_id=city_id,
                 bounding_box=bounding_box,
                 public_transport_type=public_transport_type,
                 clean=clean,
@@ -190,7 +191,7 @@ def main(argv):
                     logger=logger,
                     data_path=data_path,
                     results_path=os.path.join(results_path, "geojson"),
-                    city=city_name,
+                    city_id=city_id,
                     graph=graph,
                     sample_points=sample_points,
                     travel_time=travel_time,
@@ -202,7 +203,7 @@ def main(argv):
             GoogleCloudPlatformBucketUploader().upload_data(
                 logger=logger,
                 data_path=results_path,
-                city=city_name,
+                city_id=city_id,
                 project_id="open-public-transport",
                 bucket_name="open-public-transport.appspot.com",
                 quiet=quiet

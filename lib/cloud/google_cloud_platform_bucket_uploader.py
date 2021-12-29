@@ -1,9 +1,10 @@
-from google.cloud import storage
 import glob
 import os
 from pathlib import Path
-import inspect
+
+from google.cloud import storage
 from tracking_decorator import TrackingDecorator
+
 
 #
 # Main
@@ -12,7 +13,7 @@ from tracking_decorator import TrackingDecorator
 class GoogleCloudPlatformBucketUploader:
 
     @TrackingDecorator.track_time
-    def upload_data(self, logger, data_path, city, project_id, bucket_name, quiet=False):
+    def upload_data(self, logger, data_path, city_id, project_id, bucket_name, quiet=False):
         """
         See https://cloud.google.com/storage/docs/creating-buckets#storage-create-bucket-python
         """
@@ -36,21 +37,21 @@ class GoogleCloudPlatformBucketUploader:
         bucket.storage_class = "STANDARD"
 
         for file_path in glob.iglob(data_path + "/geojson/*.geojson"):
-            blob = bucket.blob(os.path.join(city, "geojson", os.path.basename(file_path)))
+            blob = bucket.blob(os.path.join(city_id, "geojson", os.path.basename(file_path)))
             blob.upload_from_filename(file_path)
 
             if not quiet:
                 logger.log_line("✓️ Uploading " + os.path.basename(file_path))
 
         for file_path in glob.iglob(data_path + "/sample-points/*"):
-            blob = bucket.blob(os.path.join(city, "sample-points", os.path.basename(file_path)))
+            blob = bucket.blob(os.path.join(city_id, "sample-points", os.path.basename(file_path)))
             blob.upload_from_filename(file_path)
 
             if not quiet:
                 logger.log_line("✓️ Uploading " + os.path.basename(file_path))
 
         for file_path in glob.iglob(data_path + "/styles/*.json"):
-            blob = bucket.blob(os.path.join(city, "styles", os.path.basename(file_path)))
+            blob = bucket.blob(os.path.join(city_id, "styles", os.path.basename(file_path)))
             blob.upload_from_filename(file_path)
 
             if not quiet:

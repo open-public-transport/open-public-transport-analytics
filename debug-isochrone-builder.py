@@ -60,6 +60,7 @@ def main(argv):
     # Iterate over cities
     for city in cities:
 
+        city_id = city["id"]
         city_name = city["name"]
         query = city["query"]
         area = city["area"]
@@ -67,7 +68,7 @@ def main(argv):
         bounding_box = city["bounding_box"]
         transport_association = city["transport_association"]
 
-        results_path = os.path.join(base_results_path, city_name)
+        results_path = os.path.join(base_results_path, city_id)
 
         # Initialize logger
         logger = LoggerFacade(results_path, console=True, file=True)
@@ -104,7 +105,7 @@ def main(argv):
                         logger=logger,
                         data_path=data_path,
                         results_path=os.path.join(results_path, "geojson"),
-                        city=city_name,
+                        city_id=city_id,
                         graph=graph,
                         travel_time=travel_time,
                         place=coords

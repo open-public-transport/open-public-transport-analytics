@@ -147,7 +147,7 @@ def write_coords_to_geojson(coords, file_path):
 class PointGenerator:
 
     @TrackingDecorator.track_time
-    def run(self, logger, data_path, results_path, city="berlin", num_sample_points=10_000, quiet=False, clean=False):
+    def run(self, logger, data_path, results_path, city_id="berlin", num_sample_points=10_000, quiet=False, clean=False):
 
         # Make results path
         os.makedirs(os.path.join(results_path), exist_ok=True)
@@ -156,7 +156,7 @@ class PointGenerator:
         if clean or not os.path.exists(os.path.join(results_path, "sample-points.json")):
 
             # Define valid polygons
-            polygon_file = os.path.join(data_path, "cities", city, "boundaries", "boundaries.geojson")
+            polygon_file = os.path.join(data_path, "cities", city_id, "boundaries", "boundaries.geojson")
             valid_polygons = get_polygons(read_geojson(polygon_file))
 
             # Define invalid polygons
@@ -164,7 +164,7 @@ class PointGenerator:
             for invalid_polygon in ["cemetery.geojson", "farmland.geojson", "farmyard.geojson", "forest.geojson",
                                     "garden.geojson", "park.geojson", "recreation_ground.geojson", "water.geojson",
                                     "wood.geojson"]:
-                polygon_file = os.path.join(data_path, "cities", city, "landuse", invalid_polygon)
+                polygon_file = os.path.join(data_path, "cities", city_id, "landuse", invalid_polygon)
                 if os.path.exists(polygon_file):
                     invalid_polygons += get_polygons(read_geojson(polygon_file))
 
@@ -180,7 +180,7 @@ class PointGenerator:
             write_coords_to_geojson(coords, os.path.join(results_path, "sample-points.geojson"))
 
             if not quiet:
-                logger.log_line(f"✓️ Generate {str(num_sample_points)} sample points in {city}")
+                logger.log_line(f"✓️ Generate {str(num_sample_points)} sample points in {city_id}")
 
             return coords
         else:
@@ -188,7 +188,7 @@ class PointGenerator:
             coords = load_coord_from_json(os.path.join(results_path, "sample-points.json"))
 
             if not quiet:
-                logger.log_line(f"✓️ Load {str(len(coords))} sample points for {city}")
+                logger.log_line(f"✓️ Load {str(len(coords))} sample points for {city_id}")
             if len(coords) != num_sample_points:
                 logger.log_line(
                     f"✗️ Warning: mismatch between number of requested sample points {str(num_sample_points)} and loaded sample points {len(coords)}")
