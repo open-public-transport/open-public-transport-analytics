@@ -88,10 +88,7 @@ def get_isochrones(lat, lon, public_transport_type):
 
 @app.get("/cities")
 def get_cities():
-    # TODO Implement
-    return [
-        CityMetrics()
-    ]
+    return CityMetricsBuilder(base_results_path=base_results_path).run()
 
 
 if __name__ == "__main__":
