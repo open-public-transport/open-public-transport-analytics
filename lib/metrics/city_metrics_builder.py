@@ -1,3 +1,4 @@
+import json
 import os
 
 from cities import Cities
@@ -55,54 +56,79 @@ def get_station_ids(stations):
     return nodes
 
 
+def load_json(file_path):
+    with open(file_path, "r") as f:
+        text = f.read()
+
+    return json.loads(text.replace("'", ""))
+
+
 class CityMetricsBuilder:
 
     def __init__(self, base_results_path):
         self.logger = LoggerFacade(base_results_path, console=True, file=False)
         self.base_results_path = base_results_path
 
-    def run(self):
-        cities = Cities().cities
+    def run(self, clean=False):
 
-        city_metrics_list = []
+        # Make results path
+        os.makedirs(os.path.join(self.base_results_path), exist_ok=True)
 
-        # Iterate over cities
-        for city in cities:
-            city_id = city["id"]
-            city_name = city["name"]
-            federal_state_name = city["federal_state"]
-            query = city["query"]
-            area = city["area"]
-            inhabitants = city["inhabitants"]
-            bounding_box = city["bounding_box"]
-            transport_association = city["transport_association"]
-            public_transport_types = city["public_transport_types"]
+        # Define file path
+        file_path = os.path.join(self.base_results_path, "cities.json")
 
-            results_path = os.path.join(self.base_results_path, city_id)
+        # Check if result needs to be generated
+        if clean or not os.path.exists(file_path):
 
-            city_basic_information = CityBasicInformation()
-            city_basic_information.id = city_id
-            city_basic_information.city_name = city_name
-            city_basic_information.federal_state_name = federal_state_name
-            city_basic_information.group = ""
-            city_basic_information.inhabitants = inhabitants
-            city_basic_information.area = area
-            city_basic_information.population_density = inhabitants / area
+            cities = Cities().cities
 
-            station_information_all = get_station_information(
-                logger=self.logger,
-                results_path=results_path,
-                city_id=city_id,
-                area=area,
-                inhabitants=inhabitants,
-                bounding_box=bounding_box,
-                public_transport_types=public_transport_types
-            )
+            city_metrics_list = []
 
-            city_metrics = CityMetrics()
-            city_metrics.city_basic_information = city_basic_information
-            city_metrics.station_information = [station_information_all]
+            # Iterate over cities
+            for city in cities:
+                city_id = city["id"]
+                city_name = city["name"]
+                federal_state_name = city["federal_state"]
+                query = city["query"]
+                area = city["area"]
+                inhabitants = city["inhabitants"]
+                bounding_box = city["bounding_box"]
+                transport_association = city["transport_association"]
+                public_transport_types = city["public_transport_types"]
 
-            city_metrics_list.append(city_metrics)
+                results_path = os.path.join(self.base_results_path, city_id)
 
-        return city_metrics_list
+                city_basic_information = CityBasicInformation()
+                city_basic_information.id = city_id
+                city_basic_information.city_name = city_name
+                city_basic_information.federal_state_name = federal_state_name
+                city_basic_information.group = ""
+                city_basic_information.inhabitants = inhabitants
+                city_basic_information.area = area
+                city_basic_information.population_density = inhabitants / area
+
+                station_information_all = get_station_information(
+                    logger=self.logger,
+                    results_path=results_path,
+                    city_id=city_id,
+                    area=area,
+                    inhabitants=inhabitants,
+                    bounding_box=bounding_box,
+                    public_transport_types=public_transport_types
+                )
+
+                city_metrics = CityMetrics()
+                city_metrics.city_basic_information = city_basic_information
+                city_metrics.station_information = [station_information_all]
+
+                city_metrics_list.append(city_metrics)
+
+            # Save result
+            with open(file_path, "w") as f:
+                json_content = json.dumps(city_metrics_list, default=lambda x: x.__dict__)
+                f.write("%s" % json_content)
+
+            return city_metrics_list
+        else:
+            # Load graph
+            return load_json(file_path=file_path)
