@@ -46,7 +46,7 @@ def main(argv):
     clean = False
     quiet = False
     points_per_sqkm = 100
-    start_end_times = [(7 * 60 * 60, 7.25 * 60 * 60)]
+    start_end_times = [(int(7 * 60 * 60), int(7.25 * 60 * 60))]
     travel_times = [15]
 
     # Read command line arguments
