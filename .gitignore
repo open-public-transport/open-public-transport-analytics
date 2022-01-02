@@ -6,15 +6,10 @@
 /venv/
 /cache/
 
-/lib/__pycache__
-/lib/cloud/__pycache__
-/lib/cloud/open-public-transport-2e54e67b8c92.json
-/lib/log/__pycache__
-/lib/loader/__pycache__
-/lib/loader/osmnx/__pycache__
-/lib/loader/overpass/__pycache__
-/lib/loader/peartree/__pycache__
-/app/__pycache__
+**/__pycache__
+**/*.pyc
+
+/lib/cloud/*.json
 
 /GDAL*/*
 GDAL*.tar.gz
