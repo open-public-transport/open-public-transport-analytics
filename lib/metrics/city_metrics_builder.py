@@ -4,7 +4,9 @@ import os
 from cities import Cities
 from city_basic_information import CityBasicInformation
 from city_metrics import CityMetrics
+from line_information import LineInformation
 from logger_facade import LoggerFacade
+from overpass_route_loader import OverpassRouteLoader
 from overpass_station_loader import OverpassStationLoader
 from ranked_value import RankedValue
 from station_information import StationInformation
@@ -29,8 +31,8 @@ def get_station_information(logger, results_path, city_id, area, inhabitants, bo
 
             overall_station_ids += station_ids
 
-    absolute_stations_count = RankedValue()
-    absolute_stations_count.raw_value = len(overall_station_ids)
+    absolute_station_count = RankedValue()
+    absolute_station_count.raw_value = len(overall_station_ids)
 
     relative_stations_per_sqkm = RankedValue()
     relative_stations_per_sqkm.raw_value = len(overall_station_ids) / area
@@ -39,7 +41,7 @@ def get_station_information(logger, results_path, city_id, area, inhabitants, bo
     relative_stations_per_inhabitant.raw_value = len(overall_station_ids) / inhabitants
 
     station_information = StationInformation(public_transport_type="all")
-    station_information.absolute_stations_count = absolute_stations_count
+    station_information.absolute_station_count = absolute_station_count
     station_information.relative_stations_per_sqkm = relative_stations_per_sqkm
     station_information.relative_stations_per_inhabitant = relative_stations_per_inhabitant
 
@@ -56,6 +58,52 @@ def get_station_ids(stations):
     return nodes
 
 
+def get_line_information(logger, results_path, city_id, area, inhabitants, bounding_box, public_transport_types):
+    overall_line_ids = []
+
+    for public_transport_type in public_transport_types:
+        lines = OverpassRouteLoader().run(
+            logger=logger,
+            results_path=os.path.join(results_path, "osm"),
+            city_id=city_id,
+            bounding_box=bounding_box,
+            public_transport_type=public_transport_type,
+            clean=False,
+            quiet=False
+        )
+
+        if lines is not None:
+            line_ids = get_line_ids(lines)
+
+            overall_line_ids += line_ids
+
+    absolute_lines_count = RankedValue()
+    absolute_lines_count.raw_value = len(overall_line_ids)
+
+    relative_lines_per_sqkm = RankedValue()
+    relative_lines_per_sqkm.raw_value = len(overall_line_ids) / area
+
+    relative_lines_per_inhabitant = RankedValue()
+    relative_lines_per_inhabitant.raw_value = len(overall_line_ids) / inhabitants
+
+    line_information = LineInformation(public_transport_type="all")
+    line_information.absolute_line_count = absolute_lines_count
+    line_information.relative_line_per_sqkm = relative_lines_per_sqkm
+    line_information.relative_line_per_inhabitant = relative_lines_per_inhabitant
+
+    return line_information
+
+
+def get_line_ids(lines):
+    ways = []
+    elements = lines["elements"]
+    for element in elements:
+        id = element["id"]
+        ways.append(id)
+
+    return ways
+
+
 def load_json(file_path):
     with open(file_path, "r") as f:
         text = f.read()
@@ -65,17 +113,17 @@ def load_json(file_path):
 
 class CityMetricsBuilder:
 
-    def __init__(self, base_results_path):
-        self.logger = LoggerFacade(base_results_path, console=True, file=False)
-        self.base_results_path = base_results_path
+    def __init__(self, results_path):
+        self.logger = LoggerFacade(results_path, console=True, file=False)
+        self.results_path = results_path
 
     def run(self, clean=False):
 
         # Make results path
-        os.makedirs(os.path.join(self.base_results_path), exist_ok=True)
+        os.makedirs(os.path.join(self.results_path), exist_ok=True)
 
         # Define file path
-        file_path = os.path.join(self.base_results_path, "cities.json")
+        file_path = os.path.join(self.results_path, "cities.json")
 
         # Check if result needs to be generated
         if clean or not os.path.exists(file_path):
@@ -96,7 +144,7 @@ class CityMetricsBuilder:
                 transport_association = city["transport_association"]
                 public_transport_types = city["public_transport_types"]
 
-                results_path = os.path.join(self.base_results_path, city_id)
+                results_path = os.path.join(self.results_path, city_id)
 
                 city_basic_information = CityBasicInformation()
                 city_basic_information.id = city_id
@@ -117,9 +165,20 @@ class CityMetricsBuilder:
                     public_transport_types=public_transport_types
                 )
 
+                line_information_all = get_line_information(
+                    logger=self.logger,
+                    results_path=results_path,
+                    city_id=city_id,
+                    area=area,
+                    inhabitants=inhabitants,
+                    bounding_box=bounding_box,
+                    public_transport_types=public_transport_types
+                )
+
                 city_metrics = CityMetrics()
                 city_metrics.city_basic_information = city_basic_information
                 city_metrics.station_information = [station_information_all]
+                city_metrics.line_information = [line_information_all]
 
                 city_metrics_list.append(city_metrics)
 

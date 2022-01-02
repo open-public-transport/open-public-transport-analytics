@@ -28,11 +28,11 @@ def get_station_information(results_path, city_name, bounding_box, public_transp
 
     station_ids = get_stations_in_radius(lat, lon, radius_km, stations)
 
-    absolute_stations_count = RankedValue()
-    absolute_stations_count.raw_value = len(station_ids)
+    absolute_station_count = RankedValue()
+    absolute_station_count.raw_value = len(station_ids)
 
     station_information = StationInformation(public_transport_type=public_transport_type)
-    station_information.absolute_stations_count = absolute_stations_count
+    station_information.absolute_station_count = absolute_station_count
 
     return station_information
 

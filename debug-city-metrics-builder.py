@@ -24,7 +24,7 @@ for p in library_paths:
 
 # Import library classes
 from tracking_decorator import TrackingDecorator
-from place_metrics_builder import PlaceMetricsBuilder
+from city_metrics_builder import CityMetricsBuilder
 
 # Set paths
 data_path = os.path.join(script_path, "data", "data")
@@ -36,11 +36,7 @@ base_results_path = os.path.join(script_path, "results", "results")
 
 @TrackingDecorator.track_time
 def main(argv):
-    PlaceMetricsBuilder(results_path=os.path.join(base_results_path, "berlin".lower())).run(
-        city_id="berlin",
-        lat=52.516389,
-        lon=13.377778
-    )
+    CityMetricsBuilder(results_path=os.path.join(base_results_path)).run()
 
 
 if __name__ == "__main__":
