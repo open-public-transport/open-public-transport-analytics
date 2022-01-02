@@ -108,7 +108,7 @@ Run this command to run the web server locally.
 
 ```shell
 cd ./app
-uvicorn app:app --reload
+python app.py --reload
 ```
 
 Open http://localhost:8000/docs#/ to see the OpenAPI specification.
