@@ -124,7 +124,7 @@ docker run -p 8080:8000 open-public-transport
 
 ### Usage (docker deployment)
 
-Run this command to deploy the Docker image to Google CLoud.
+Run this command to deploy the Docker image to Google Cloud.
 
 ```shell
 gcloud builds submit --tag gcr.io/open-public-transport/open-public-transport-backend
