@@ -7,5 +7,5 @@ class StationInformation:
         self.absolute_station_count = RankedValue()
         self.absolute_station_accessibility_count = RankedValue()
         self.relative_station_accessibility_percentage = RankedValue()
-        self.relative_station_per_sqkm = RankedValue()
-        self.relative_station_per_inhabitant = RankedValue()
+        self.relative_stations_per_sqkm = RankedValue()
+        self.relative_stations_per_inhabitant = RankedValue()
