@@ -38,9 +38,15 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        # LOCAL
         "http://localhost:4200",
+        # QA
         "https://open-public-transport-qa.web.app",
-        "https://openpublictransport.de",
+        "https://open-public-transport-qa.firebaseapp.com",
+        # PROD
+        "https://open-public-transport-prod.web.app",
+        "https://open-public-transport-prod.firebaseapp.com",
+        "https://openpublictransport.de"
     ],
     allow_credentials=True,
     allow_methods=["*"],
