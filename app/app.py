@@ -58,13 +58,19 @@ app.add_middleware(
 #
 
 @app.get("/isochrones")
-def get_isochrones(city):
+def get_isochrones(city="berlin"):
+    # TODO Implement
+    return {}
+
+@app.get("/isochrone")
+def get_isochrones(lat=52.516389, lon=13.377778, public_transport_type="tram"):
     # TODO Implement
     return {}
 
 
+
 @app.get("/transport")
-def get_isochrones(city, public_transport_type):
+def get_isochrones(city="berlin", public_transport_type="tram"):
     # TODO Implement
     return {}
 
@@ -81,20 +87,14 @@ def get_place_metrics(city_id="berlin", lat=52.516389, lon=13.377778):
         lon=lon
     )
 
-
-@app.get("/isochrone")
-def get_isochrones(lat, lon, public_transport_type):
-    # TODO Implement
-    return {}
-
-
 #
 # Overview
 #
 
-@app.get("/cities")
-def get_cities():
-    return CityMetricsBuilder(results_path=base_results_path).run(clean=False)
+# temporary deaktivated .... is an endless loader with to much errors 
+#@app.get("/cities")
+#def get_cities():
+#    return CityMetricsBuilder(results_path=base_results_path).run(clean=False)
 
 
 if __name__ == "__main__":
