@@ -4,29 +4,72 @@ import os
 from bike_information import BikeInformation
 from cities import Cities
 from line_information import LineInformation
-from overpass_station_loader import OverpassStationLoader
-from overpass_route_loader import OverpassRouteLoader
+from overpass_loader import OverpassLoader
 from place_metrics import PlaceMetrics
 from ranked_value import RankedValue
 from station_information import StationInformation
 
 
 def get_station_information(results_path, city_name, bounding_box, public_transport_type, lat, lon):
-    stations = OverpassStationLoader().run(
-        logger=None,
-        results_path=os.path.join(results_path, "osm"),
-        city_id=city_name,
-        bounding_box=bounding_box,
-        public_transport_type=public_transport_type,
-        clean=False,
-        quiet=True
-    )
-
     walking_time_min = 15
     walking_speed_kph = 4.5
     radius_km = walking_time_min / 60 * walking_speed_kph
 
-    station_ids = get_stations_in_radius(lat, lon, radius_km, stations)
+    # List of IDs of what we consider a station (may be a stop area containing multiple stations)
+    station_ids = []
+
+    overpass_loader = OverpassLoader(
+        logger=None,
+        results_path=os.path.join(results_path, "osm"),
+        city_id=city_name,
+        bounding_box=bounding_box,
+        clean=False,
+        quiet=True
+    )
+
+    if public_transport_type == "bus":
+        # FIXME
+        bus_stops = overpass_loader.run(result_file_name="nodes_bus_stop.json", query='node["highway"="bus_stop"]')
+        bus_platforms = overpass_loader.run(
+            result_file_name="ways_bus_platform.json",
+            query='way["public_transport"="platform"]["bus"="yes"]'
+        )
+        bus_stop_areas = overpass_loader.run(
+            result_file_name="relations_bus_stop_area.json",
+            query='relation["type"="public_transport"]["public_transport"="stop_area"]'
+        )
+
+        bus_stop_ids = get_nodes_in_radius(lat, lon, radius_km, bus_stops)
+        bus_platform_ids = get_way_ids_by_node_ids(bus_platforms, bus_stop_ids)
+        bus_stop_area_ids = get_relation_ids_by_node_ids(bus_stop_areas, bus_platform_ids)
+        station_ids = bus_stop_area_ids
+    elif public_transport_type == "light_rail":
+        light_rail_stations = overpass_loader.run(
+            result_file_name="nodes_light_rail_station.json",
+            query='node["railway"="station"]["public_transport"="station"]["light_rail"="yes"]'
+        )
+
+        station_ids = get_nodes_in_radius(lat, lon, radius_km, light_rail_stations)
+    elif public_transport_type == "tram":
+        tram_stops = overpass_loader.run(
+            result_file_name="nodes_tram_stop.json",
+            query='node["railway"="tram_stop"]["public_transport"="stop_position"]["tram"="yes"]'
+        )
+        tram_stop_areas = overpass_loader.run(
+            result_file_name="relations_tram_stop.json",
+            query='relation["type"="public_transport"]["public_transport"="stop_area"]'
+        )
+
+        tram_stop_ids = get_nodes_in_radius(lat, lon, radius_km, tram_stops)
+        tram_stop_area_ids = get_relation_ids_by_node_ids(tram_stop_areas, tram_stop_ids)
+        station_ids = tram_stop_area_ids
+    elif public_transport_type == "subway":
+        subway_stations = overpass_loader.run(
+            result_file_name="nodes_subway_station.json",
+            query='node["railway"="station"]["public_transport"="station"]["subway"="yes"]'
+        )
+
+        station_ids = get_nodes_in_radius(lat, lon, radius_km, subway_stations)
 
     absolute_station_count = RankedValue()
     absolute_station_count.raw_value = len(station_ids)
@@ -36,32 +79,83 @@ def get_station_information(results_path, city_name, bounding_box, public_transp
 
     return station_information
 
-def get_line_information(results_path, city_name, bounding_box, public_transport_type, lat, lon):
-    stations = OverpassStationLoader().run(
-        logger=None,
-        results_path=os.path.join(results_path, "osm"),
-        city_id=city_name,
-        bounding_box=bounding_box,
-        public_transport_type=public_transport_type,
-        clean=False,
-        quiet=True
-    )
-    routes = OverpassRouteLoader().run(
-        logger=None,
-        results_path=os.path.join(results_path, "osm"),
-        city_id=city_name,
-        bounding_box=bounding_box,
-        public_transport_type=public_transport_type,
-        clean=False,
-        quiet=True
-    )
 
+def get_line_information(results_path, city_name, bounding_box, public_transport_type, lat, lon):
     walking_time_min = 15
     walking_speed_kph = 4.5
     radius_km = walking_time_min / 60 * walking_speed_kph
 
-    station_ids = get_stations_in_radius(lat, lon, radius_km, stations)
-    line_ids = get_lines_by_stations(routes, station_ids)
+    # List of IDs of what we consider a line
+    line_ids = []
+
+    overpass_loader = OverpassLoader(
+        logger=None,
+        results_path=os.path.join(results_path, "osm"),
+        city_id=city_name,
+        bounding_box=bounding_box,
+        clean=False,
+        quiet=True
+    )
+
+    if public_transport_type == "bus":
+        # FIXME
+        #
+        # # Limited bounding box around target
+        # limited_bounding_box = [float(lon) - 0.025, float(lat) - 0.025, float(lon) + 0.025, float(lat) + 0.025]
+        #
+        # bus_stops = overpass_loader.run(result_file_name="nodes_bus_stop.json", query='node["highway"="bus_stop"]')
+        # bus_platforms = overpass_loader.run(result_file_name="ways_bus_platform.json",
+        #                                     query='way["public_transport"="platform"]["bus"="yes"]')
+        # bus_routes = overpass_loader.run(result_file_name="relations_bus_route.json",
+        #                                  query='relation["type"="route"]["route"="bus"]',
+        #                                  bounding_box=limited_bounding_box,
+        #                                  clean=True)
+        #
+        # bus_stop_ids = get_nodes_in_radius(lat, lon, radius_km, bus_stops)
+        # bus_platform_ids = get_way_ids_by_node_ids(bus_platforms, bus_stop_ids)
+        # bus_route_ids = get_relation_ids_by_node_ids(bus_routes, bus_platform_ids)
+        # line_ids = bus_route_ids
+        line_ids = []
+    elif public_transport_type == "light_rail":
+        # FIXME
+        light_rail_stations = overpass_loader.run(
+            result_file_name="nodes_light_rail_station.json",
+            query='node["railway"="stop"]["public_transport"="stop_position"]["light_rail"="yes"]'
+        )
+        light_rail_routes = overpass_loader.run(
+            result_file_name="relations_light_rail_route.json",
+            query='relation["line"="light_rail"]["route"="train"]'
+        )
+
+        light_rail_station_ids = get_nodes_in_radius(lat, lon, radius_km, light_rail_stations)
+        light_rail_route_ids = get_relation_ids_by_node_ids2(light_rail_routes, light_rail_station_ids)
+        line_ids = light_rail_route_ids
+    elif public_transport_type == "tram":
+        tram_stops = overpass_loader.run(
+            result_file_name="nodes_tram_stop.json",
+            query='node["railway"="tram_stop"]["public_transport"="stop_position"]["tram"="yes"]'
+        )
+        tram_routes = overpass_loader.run(
+            result_file_name="relations_tram_route.json", query='relation["route"="tram"]'
+        )
+
+        tram_stop_ids = get_nodes_in_radius(lat, lon, radius_km, tram_stops)
+        tram_route_ids = get_relation_ids_by_node_ids2(tram_routes, tram_stop_ids)
+        line_ids = tram_route_ids
+    elif public_transport_type == "subway":
+        # FIXME
+        subway_stations = overpass_loader.run(
+            result_file_name="nodes_subway_station.json",
+            query='node["railway"="station"]["public_transport"="station"]["subway"="yes"]'
+        )
+        subway_routes = overpass_loader.run(
+            result_file_name="relations_subway_route.json",
+            query='relation["route"="subway"]'
+        )
+
+        subway_station_ids = get_nodes_in_radius(lat, lon, radius_km, subway_stations)
+        subway_route_ids = get_relation_ids_by_node_ids2(subway_routes, subway_station_ids)
+        line_ids = subway_route_ids
 
     absolute_line_count = RankedValue()
     absolute_line_count.raw_value = len(line_ids)
@@ -91,11 +185,11 @@ def get_distance(point_a, point_b):
     return earth_radius * c
 
 
-def get_stations_in_radius(lat, lon, radius, stations):
+def get_nodes_in_radius(lat, lon, radius, stations):
     nodes = []
     elements = stations["elements"]
     for element in elements:
-        id = element["id"]
+        element_id = element["id"]
         station_lat = element["lat"]
         station_lon = element["lon"]
 
@@ -104,9 +198,61 @@ def get_stations_in_radius(lat, lon, radius, stations):
         distance = get_distance(start_point, station_point)
 
         if distance < radius:
-            nodes.append(id)
+            nodes.append(element_id)
 
     return nodes
+
+
+def get_way_ids_by_node_ids(ways, node_ids):
+    results = []
+
+    if ways is not None:
+        elements = ways["elements"]
+        for element in elements:
+            element_id = element["id"]
+            members = element["nodes"]
+
+            for member in members:
+                if member in node_ids and element_id not in results:
+                    results.append(element_id)
+
+    return results
+
+
+def get_relation_ids_by_node_ids(relations, node_ids, element_name="id"):
+    results = []
+
+    if relations is not None:
+        elements = relations["elements"]
+        for element in elements:
+            element_id = element[element_name]
+            members = element["members"]
+
+            for member in members:
+                member_type = member["type"]
+                ref = member["ref"]
+                if member_type == "node" and ref in node_ids and element_id not in results:
+                    results.append(element_id)
+
+    return results
+
+
+def get_relation_ids_by_node_ids2(relations, node_ids):
+    results = []
+
+    if relations is not None:
+        elements = relations["elements"]
+        for element in elements:
+            element_ref = element["tags"]["ref"]
+            members = element["members"]
+
+            for member in members:
+                member_type = member["type"]
+                ref = member["ref"]
+                if member_type == "node" and ref in node_ids and element_ref not in results:
+                    results.append(element_ref)
+
+    return results
 
 
 def get_lines_by_stations(routes, station_ids):
@@ -115,16 +261,17 @@ def get_lines_by_stations(routes, station_ids):
     if routes is not None:
         elements = routes["elements"]
         for element in elements:
-            id = element["id"]
+            element_id = element["id"]
             members = element["members"]
 
             for member in members:
                 role = member["role"]
                 ref = member["ref"]
-                if role == "stop" and ref in station_ids and id not in lines:
-                    lines.append(id)
+                if role == "stop" and ref in station_ids and element_id not in lines:
+                    lines.append(element_id)
 
     return lines
+
 
 class PlaceMetricsBuilder:
 
@@ -142,8 +289,14 @@ class PlaceMetricsBuilder:
         line_information = []
 
         for public_transport_type in public_transport_types:
-            transport_station_information = get_station_information(self.results_path, city_name, bounding_box, public_transport_type=public_transport_type, lat=lat, lon=lon)
-            transport_line_information = get_line_information(self.results_path, city_name, bounding_box, public_transport_type=public_transport_type, lat=lat, lon=lon)
+            transport_station_information = get_station_information(
+                self.results_path, city_name, bounding_box, public_transport_type=public_transport_type, lat=lat,
+                lon=lon
+            )
+            transport_line_information = get_line_information(
+                self.results_path, city_name, bounding_box, public_transport_type=public_transport_type, lat=lat,
+                lon=lon
+            )
 
             if transport_station_information is not None:
                 station_information.append(transport_station_information)
