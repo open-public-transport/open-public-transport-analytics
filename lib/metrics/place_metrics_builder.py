@@ -63,11 +63,11 @@ def get_line_information(results_path, city_name, bounding_box, public_transport
     station_ids = get_stations_in_radius(lat, lon, radius_km, stations)
     line_ids = get_lines_by_stations(routes, station_ids)
 
-    absolute_lines_count = RankedValue()
-    absolute_lines_count.raw_value = len(line_ids)
+    absolute_line_count = RankedValue()
+    absolute_line_count.raw_value = len(line_ids)
 
     line_information = LineInformation(public_transport_type=public_transport_type)
-    line_information.absolute_lines_count = absolute_lines_count
+    line_information.absolute_line_count = absolute_line_count
 
     return line_information
 

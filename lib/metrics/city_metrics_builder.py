@@ -77,8 +77,8 @@ def get_line_information(logger, results_path, city_id, area, inhabitants, bound
 
             overall_line_ids += line_ids
 
-    absolute_lines_count = RankedValue()
-    absolute_lines_count.raw_value = len(overall_line_ids)
+    absolute_line_count = RankedValue()
+    absolute_line_count.raw_value = len(overall_line_ids)
 
     relative_lines_per_sqkm = RankedValue()
     relative_lines_per_sqkm.raw_value = len(overall_line_ids) / area
@@ -87,7 +87,7 @@ def get_line_information(logger, results_path, city_id, area, inhabitants, bound
     relative_lines_per_inhabitant.raw_value = len(overall_line_ids) / inhabitants
 
     line_information = LineInformation(public_transport_type="all")
-    line_information.absolute_line_count = absolute_lines_count
+    line_information.absolute_line_count = absolute_line_count
     line_information.relative_line_per_sqkm = relative_lines_per_sqkm
     line_information.relative_line_per_inhabitant = relative_lines_per_inhabitant
 
