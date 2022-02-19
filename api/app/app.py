@@ -191,7 +191,7 @@ def get_metrics(lat, lon):
 
         #return geometry.within(circle_buffer) #VERSION 1 -> lines 3813 -> Wall time: 1.09 s
         #return circle_buffer.contains(geometry) #VERSION 2 -> lines 3813 -> Wall time: 1.13 s
-        return point.distance(geometry) < distance #VERSION 3 -> 
+        return point.distance(geometry) < distance #VERSION 3 -> lines 3898 -> Wall time: 1.31 s
 
     # TODO Implement methode to find nearby stations
     def find_nearby_stations(point, data):
