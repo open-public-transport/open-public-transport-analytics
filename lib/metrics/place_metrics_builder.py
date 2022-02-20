@@ -45,10 +45,21 @@ def get_station_information(results_path, city_name, bounding_box, public_transp
     elif public_transport_type == "light_rail":
         light_rail_stations = overpass_loader.run(
             result_file_name="nodes_light_rail_station.json",
-            query='node["railway"="station"]["public_transport"="station"]["light_rail"="yes"]'
+            query='node["railway"~"station|halt"]["public_transport"="station"]["light_rail"="yes"]'
+        )
+        light_rail_stop_areas = overpass_loader.run(
+            result_file_name="relations_light_rail_stop_area.json",
+            query='relation["type"="public_transport"]["public_transport"="stop_area"]'
+        )
+        light_rail_stop_area_groups = overpass_loader.run(
+            result_file_name="relations_light_rail_stop_area_group.json",
+            query='relation["type"="public_transport"]["public_transport"="stop_area_group"]'
         )
 
-        station_ids = get_nodes_in_radius(lat, lon, radius_km, light_rail_stations)
+        light_rail_station_ids = get_nodes_in_radius(lat, lon, radius_km, light_rail_stations)
+        light_rail_stop_area_ids = get_relation_ids_by_node_ids(light_rail_stop_areas, light_rail_station_ids)
+        light_rail_stop_area_group_ids = get_relation_ids_by_relation_ids(light_rail_stop_area_groups, light_rail_stop_area_ids)
+        station_ids = light_rail_stop_area_group_ids
     elif public_transport_type == "tram":
         tram_stops = overpass_loader.run(
             result_file_name="nodes_tram_stop.json",
@@ -58,17 +69,34 @@ def get_station_information(results_path, city_name, bounding_box, public_transp
             result_file_name="relations_tram_stop.json",
             query='relation["type"="public_transport"]["public_transport"="stop_area"]'
         )
+        tram_stop_area_groups = overpass_loader.run(
+            result_file_name="relations_tram_stop_area_group.json",
+            query='relation["type"="public_transport"]["public_transport"="stop_area_group"]'
+        )
 
         tram_stop_ids = get_nodes_in_radius(lat, lon, radius_km, tram_stops)
         tram_stop_area_ids = get_relation_ids_by_node_ids(tram_stop_areas, tram_stop_ids)
-        station_ids = tram_stop_area_ids
+        tram_stop_area_group_ids = get_relation_ids_by_relation_ids(tram_stop_area_groups, tram_stop_area_ids)
+        station_ids = tram_stop_area_group_ids
     elif public_transport_type == "subway":
         subway_stations = overpass_loader.run(
             result_file_name="nodes_subway_station.json",
-            query='node["railway"="station"]["public_transport"="station"]["subway"="yes"]'
+            query='node["railway"~"station|halt"]["public_transport"="station"]["subway"="yes"]'
         )
-
-        station_ids = get_nodes_in_radius(lat, lon, radius_km, subway_stations)
+        subway_stop_areas = overpass_loader.run(
+            result_file_name="relations_subway_stop_area.json",
+            query='relation["type"="public_transport"]["public_transport"="stop_area"]'
+        )
+        subway_stop_area_groups = overpass_loader.run(
+            result_file_name="relations_subway_stop_area_group.json",
+            query='relation["type"="public_transport"]["public_transport"="stop_area_group"]'
+        )
+    
+        subway_station_ids = get_nodes_in_radius(lat, lon, radius_km, subway_stations)
+        subway_stop_area_ids = get_relation_ids_by_node_ids(subway_stop_areas, subway_station_ids)
+        subway_stop_area_group_ids = get_relation_ids_by_relation_ids(subway_stop_area_groups,
+                                                                          subway_stop_area_ids)
+        station_ids = subway_stop_area_group_ids
 
     absolute_station_count = RankedValue()
     absolute_station_count.raw_value = len(station_ids)
@@ -218,7 +246,7 @@ def get_way_ids_by_node_ids(ways, node_ids):
     return results
 
 
-def get_relation_ids_by_way_ids(relations, way_ids, element_name="id"):
+def get_relation_ids_by_relation_ids(relations, relation_ids, element_name="id"):
     results = []
 
     if relations is not None:
@@ -230,7 +258,7 @@ def get_relation_ids_by_way_ids(relations, way_ids, element_name="id"):
             for member in members:
                 member_type = member["type"]
                 ref = member["ref"]
-                if member_type == "way" and ref in way_ids and element_id not in results:
+                if member_type == "relation" and ref in relation_ids and element_id not in results:
                     results.append(element_id)
 
     return results
