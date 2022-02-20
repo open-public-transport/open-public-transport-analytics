@@ -28,7 +28,6 @@ def get_station_information(results_path, city_name, bounding_box, public_transp
     )
 
     if public_transport_type == "bus":
-        # FIXME
         bus_stops = overpass_loader.run(result_file_name="nodes_bus_stop.json", query='node["highway"="bus_stop"]')
         bus_platforms = overpass_loader.run(
             result_file_name="ways_bus_platform.json",
@@ -41,7 +40,7 @@ def get_station_information(results_path, city_name, bounding_box, public_transp
 
         bus_stop_ids = get_nodes_in_radius(lat, lon, radius_km, bus_stops)
         bus_platform_ids = get_way_ids_by_node_ids(bus_platforms, bus_stop_ids)
-        bus_stop_area_ids = get_relation_ids_by_node_ids(bus_stop_areas, bus_platform_ids)
+        bus_stop_area_ids = get_relation_ids_by_way_ids(bus_stop_areas, bus_platform_ids)
         station_ids = bus_stop_area_ids
     elif public_transport_type == "light_rail":
         light_rail_stations = overpass_loader.run(
@@ -219,6 +218,23 @@ def get_way_ids_by_node_ids(ways, node_ids):
     return results
 
 
+def get_relation_ids_by_way_ids(relations, way_ids, element_name="id"):
+    results = []
+
+    if relations is not None:
+        elements = relations["elements"]
+        for element in elements:
+            element_id = element[element_name]
+            members = element["members"]
+
+            for member in members:
+                member_type = member["type"]
+                ref = member["ref"]
+                if member_type == "way" and ref in way_ids and element_id not in results:
+                    results.append(element_id)
+
+    return results
+
 def get_relation_ids_by_node_ids(relations, node_ids, element_name="id"):
     results = []
 
@@ -293,15 +309,15 @@ class PlaceMetricsBuilder:
                 self.results_path, city_name, bounding_box, public_transport_type=public_transport_type, lat=lat,
                 lon=lon
             )
-            transport_line_information = get_line_information(
-                self.results_path, city_name, bounding_box, public_transport_type=public_transport_type, lat=lat,
-                lon=lon
-            )
+            # transport_line_information = get_line_information(
+            #     self.results_path, city_name, bounding_box, public_transport_type=public_transport_type, lat=lat,
+            #     lon=lon
+            # )
 
             if transport_station_information is not None:
                 station_information.append(transport_station_information)
-            if transport_line_information is not None:
-                line_information.append(transport_line_information)
+            # if transport_line_information is not None:
+            #     line_information.append(transport_line_information)
 
         return PlaceMetrics(
             station_information=station_information,
